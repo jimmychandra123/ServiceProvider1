@@ -239,8 +239,8 @@ public class SPAddServiceActivity extends Fragment implements OnMapReadyCallback
     public void fnInsertFB(){
         String SP_id = mAuth.getCurrentUser().getUid();
         final String id = mDatabase.child("Service").push().getKey();
-        String SP_name = name.getText().toString();
-        service = new Service(id,markerLat,markerLong,SP_name,stateSelection,typeSelection);
+        String S_name = name.getText().toString();
+        service = new Service(id,markerLat,markerLong,S_name,stateSelection,typeSelection,SP_id);
 //        Search search = new Search(id,"barber",stateSelection,markerLat,markerLong);
         mDatabase.child("Service").child(SP_id).child(id).setValue(service).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override

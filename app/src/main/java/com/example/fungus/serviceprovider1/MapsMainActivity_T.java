@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -18,15 +19,24 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.fungus.serviceprovider1.model.Service;
+import com.example.fungus.serviceprovider1.model.User;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -38,8 +48,11 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyCallback,NavigationView.OnNavigationItemSelectedListener{
+public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyCallback,NavigationView.OnNavigationItemSelectedListener,GoogleMap.OnMarkerClickListener {
 
+    private FusedLocationProviderClient fusedLocationProviderClient;
+//    protected LocationManager locationManager;
+//    protected LocationListener locationListener;
     private GoogleMap mMap;
     private static final int LOCATION_REQUEST = 500;
     private FirebaseAuth mAuth;
@@ -52,6 +65,13 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
     private Location currentLocation;
     private ArrayList<Double> distances = new ArrayList<>();
     private String search = null;
+    private Marker marker;
+
+    private Button btnBook;
+    private TextView p_serviceName,p_servicePName,p_serviceType;
+    private ConstraintLayout constraintLayout;
+    private User user;
+    String sp_id,s_id,s_name=null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +80,14 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar2);
         setSupportActionBar(toolbar);
+
+        constraintLayout = findViewById(R.id.selectedServiceView);
+        btnBook = findViewById(R.id.p_ServiceBook);
+        p_serviceName = findViewById(R.id.p_serviceName);
+        p_servicePName = findViewById(R.id.p_servicePName);
+        p_serviceType = findViewById(R.id.p_serviceType);
+
+        constraintLayout.setVisibility(View.INVISIBLE);
 
         final SlidingUpPanelLayout slidingUpPanelLayout = findViewById(R.id.sliding_layout);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout2);
@@ -72,15 +100,38 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
         navigationView.setNavigationItemSelectedListener(this);
 
 //         Obtain the SupportMapFragment and get notified when the map is ready to be used.
+//        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            ActivityCompat.requestPermissions(this, new String[] {android.Manifest.permission.ACCESS_FINE_LOCATION}, 101);
+//            return;
+//        }
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        fetchLastLocation();
+
 
         sharedPreferences = getApplicationContext().getSharedPreferences("authentication",0);
         editor = sharedPreferences.edit();
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseDatabase.getInstance().getReference();
+
+        btnBook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(sp_id!=null&&s_id!=null&&s_name!=null){
+                    Intent intent = new Intent(getApplicationContext(),UserBookServiceActivity.class);
+                    intent.putExtra("sp_id",sp_id);
+                    intent.putExtra("s_id",s_id);
+                    intent.putExtra("s_name",s_name);
+                    startActivity(intent);
+                }else{
+                    Toast.makeText(getApplicationContext(),"Pick a service!",Toast.LENGTH_SHORT);
+                }
+            }
+        });
 
         final String [] searchArray = getResources().getStringArray(R.array.search_service);
         ListView listView = findViewById(R.id.contentListView);
@@ -107,7 +158,7 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
                 while (iterator.hasNext()) {
                     DataSnapshot next = (DataSnapshot) iterator.next();
                     //getting value
-                    Service service = new Service(next.child("s_id").getValue().toString(), Double.valueOf(next.child("s_latitude").getValue().toString()),Double.valueOf(next.child("s_longitude").getValue().toString()),next.child("s_name").getValue().toString(),next.child("s_state").getValue().toString(),next.child("s_type").getValue().toString());
+                    Service service = new Service(next.child("s_id").getValue().toString(), Double.valueOf(next.child("s_latitude").getValue().toString()),Double.valueOf(next.child("s_longitude").getValue().toString()),next.child("s_name").getValue().toString(),next.child("s_state").getValue().toString(),next.child("s_type").getValue().toString(),next.child("sp_id").getValue().toString());
 //                    services.add(next.getValue(Service.class));
                     Location serviceLocation = new Location(currentLocation);
                     serviceLocation.setLatitude(service.getS_latitude());
@@ -142,7 +193,8 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
                     if(i>10){
                         break;
                     }else{
-                        mMap.addMarker(new MarkerOptions().position(new LatLng(services.get(i).getS_latitude(), services.get(i).getS_longitude())).title(services.get(i).getS_name()));
+                        marker = mMap.addMarker(new MarkerOptions().position(new LatLng(services.get(i).getS_latitude(), services.get(i).getS_longitude())).title(services.get(i).getS_name()));
+                        marker.setTag(services.get(i).getS_id());
                     }
                 }
 //                for(DataSnapshot data : dataSnapshot.getChildren()){
@@ -210,6 +262,28 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
         double d = R * c;
         return d; // returns the distance in meter
     }
+
+    private void fetchLastLocation(){
+        Task<Location> task = fusedLocationProviderClient.getLastLocation();
+        task.addOnSuccessListener(new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if (location != null) {
+                    currentLocation = location;
+                    Toast.makeText(MapsMainActivity_T.this,currentLocation.getLatitude()+" "+currentLocation.getLongitude(),Toast.LENGTH_SHORT).show();
+                    LatLng latLng = new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude());
+                    mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                            new LatLng(currentLocation.getLatitude(),
+                                    currentLocation.getLongitude()), 14));
+//                    SupportMapFragment supportMapFragment= (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+//                    supportMapFragment.getMapAsync(MapsMainActivity_T.this);
+                }else{
+                    Toast.makeText(MapsMainActivity_T.this,"No Location recorded",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -228,20 +302,24 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
             return;
         }
         mMap.setMyLocationEnabled(true);
-        if (mMap != null) {
-//            Location arg0 = mMap.getMyLocation();
-//            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(arg0.getLatitude(), arg0.getLongitude()), 14));
-            mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
+        mMap.setOnMarkerClickListener(this);
 
-                @Override
-                public void onMyLocationChange(Location arg0) {
-                    // TODO Auto-generated method stub
-                    currentLocation = arg0;
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(arg0.getLatitude(), arg0.getLongitude()), 14));
-//                    mMap.addMarker(new MarkerOptions().position(new LatLng(arg0.getLatitude(), arg0.getLongitude())).title("It's Me!"));
-                }
-            });
-        }
+
+//        if (mMap != null) {
+////            Location arg0 = mMap.getMyLocation();
+//
+////            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(arg0.getLatitude(), arg0.getLongitude()), 14));
+//            mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
+//
+//                @Override
+//                public void onMyLocationChange(Location arg0) {
+//                    // TODO Auto-generated method stub
+//                    currentLocation = arg0;
+//                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(arg0.getLatitude(), arg0.getLongitude()), 14));
+////                    mMap.addMarker(new MarkerOptions().position(new LatLng(arg0.getLatitude(), arg0.getLongitude())).title("It's Me!"));
+//                }
+//            });
+//        }
 
 
 
@@ -266,7 +344,43 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
             mAuth.signOut();
             startActivity(new Intent(MapsMainActivity_T.this, LoginActivity.class)); //Go back to home page
             finish();
+        }else if(id == R.id.nav_booking){
+            startActivity(new Intent(MapsMainActivity_T.this, UserManageBookingActivity.class)); //Go to booking page
         }
         return true;
         }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+
+        String id = (String)marker.getTag();
+        if(id!=null){
+            for(final Service service : services){
+                if(service.getS_id().equals(id)){
+                    ValueEventListener listener = new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            user = dataSnapshot.getValue(User.class);
+                            constraintLayout.setVisibility(View.VISIBLE);
+                            p_serviceName.setText(service.getS_name());
+                            p_serviceType.setText(service.getS_type());
+                            p_servicePName.setText(user.getName());
+                            sp_id = service.getSp_id();
+                            s_id =  service.getS_id();
+                            s_name = service.getS_name();
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+                        }
+                    };
+//                    Log.e(TAG,service.getSp_id());
+                    db.child("users").child(service.getSp_id()).addListenerForSingleValueEvent(listener);
+
+                }
+            }
+        }
+        return false;
+    }
 }

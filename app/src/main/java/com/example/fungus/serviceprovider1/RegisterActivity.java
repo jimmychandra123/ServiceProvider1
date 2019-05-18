@@ -101,7 +101,7 @@ public class RegisterActivity extends AppCompatActivity {
                     startActivity(new Intent(RegisterActivity.this,MapsMainActivity_T.class));
                     finish();
                 }else if(userType==1){
-                    startActivity(new Intent(RegisterActivity.this,NavigationDrawerActivity.class));
+                    startActivity(new Intent(RegisterActivity.this,SPNavigationDrawerActivity.class));
                     finish();
                 }else{
                     Toast.makeText(RegisterActivity.this,"Error",Toast.LENGTH_SHORT);

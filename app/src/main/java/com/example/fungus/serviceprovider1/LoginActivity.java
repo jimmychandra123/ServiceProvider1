@@ -574,15 +574,19 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 editor.putString("password",mPassword);
                 editor.commit();
                 if(condition==4){
+                    Log.e("e","4");
                     startActivity(new Intent(LoginActivity.this,RegisterActivity.class));
                     finish();
                 }else if(userType == 0){
-                    //
+                    Log.e("usertype","0");
                     startActivity( new Intent(LoginActivity.this,MapsMainActivity_T.class));
                     finish();
                 }else if(userType == 1){
-                    startActivity(new Intent(LoginActivity.this,NavigationDrawerActivity.class));
+                    Log.e("usertype","1");
+                    startActivity(new Intent(LoginActivity.this,SPNavigationDrawerActivity.class));
                     finish();
+                }else{
+                    Log.e("e","e");
                 }
             } else {
 //                Toast.makeText(getApplicationContext(),"Authentication fail",Toast.LENGTH_SHORT);

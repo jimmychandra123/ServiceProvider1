@@ -24,14 +24,20 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".MainActivity" />
-        <activity android:name=".LoginActivity"></activity>
+        <activity android:name=".LoginActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <!-- <activity -->
         <!-- android:name=".MenuActivity" -->
         <!-- android:theme="@style/AppTheme.NoActionBar"></activity> -->
         <activity
             android:name=".NavigationDrawerActivity"
             android:label="@string/title_activity_navigation_drawer"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".SearchableActivity">
             <meta-data
                 android:name="android.app.searchable"
@@ -57,18 +63,24 @@
             android:label="@string/title_activity_maps" />
         <activity
             android:name=".MapsMainActivity_T"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".SPMenuActivity_T2" />
-        <activity android:name=".TestActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+        <activity
+            android:name=".TestActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".UserBookServiceActivity" />
+        <activity android:name=".UserManageBookingActivity" />
+        <activity
+            android:name=".SPNavigationDrawerActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".SPManageBookingActivity" />
+        <activity
+            android:name=".UserMessageActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".MapsCurrentLocationActivity">
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
     </application>
 

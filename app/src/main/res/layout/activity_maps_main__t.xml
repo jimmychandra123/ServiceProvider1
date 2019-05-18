@@ -14,8 +14,7 @@
     <android.support.design.widget.CoordinatorLayout
         android:id="@+id/coodLay1"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".NavigationDrawerActivity">
+        android:layout_height="match_parent">
 
         <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
@@ -83,6 +82,13 @@
             <!--app:layout_constraintTop_toTopOf="@+id/map"-->
             <!--app:srcCompat="@drawable/ic_search" />-->
 
+        <include
+            layout="@layout/service_profile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
     </android.support.constraint.ConstraintLayout>
 
     <android.support.design.widget.NavigationView
@@ -91,8 +97,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        app:headerLayout="@layout/nav_header_navigation_drawer"
-        app:menu="@menu/activity_navigation_drawer_drawer" />
+        app:menu="@menu/activity_navigation_drawer_user" />
 
 
 </android.support.v4.widget.DrawerLayout>
