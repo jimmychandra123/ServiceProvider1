@@ -105,7 +105,7 @@ public class UserBookServiceActivity extends AppCompatActivity {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         final String u_id = auth.getCurrentUser().getUid();
         final String id = databaseReference.child("Booking").push().getKey();
-        final Booking booking = new Booking(id,date,time,s_id,sp_id,u_id);
+        final Booking booking = new Booking(id,date,time,s_id,sp_id,u_id,"Pending");
         final HashMap<String,String> a = new HashMap<>();
         a.put("b_id",id);
 

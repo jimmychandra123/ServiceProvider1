@@ -87,6 +87,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private FirebaseAuth.AuthStateListener mAuthListener;
     private DatabaseReference mDatabase;
     ValueEventListener postListener;
+    private String id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,11 +134,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 if (user != null) {
                     // User is signed in
                     Log.e(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                    Toast.makeText(getApplicationContext(),"Successfully signed in with: " + user.getEmail(),Toast.LENGTH_SHORT);
+                    Toast.makeText(getApplicationContext(),"Successfully signed in with: " + user.getEmail(),Toast.LENGTH_SHORT).show();
                 } else {
                     // User is signed out
                     Log.e(TAG, "onAuthStateChanged:signed_out");
-                    Toast.makeText(getApplicationContext(),"Successfully signed out.",Toast.LENGTH_SHORT);
+                    Toast.makeText(getApplicationContext(),"Successfully signed out.",Toast.LENGTH_SHORT).show();
                 }
                 // ...
             }
@@ -395,44 +396,37 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         protected Boolean doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
             // firebase
-            Log.e("email",mEmail);
-            Log.e("password",mPassword);
-            postListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    // Get Post object and use the values to update the UI
-                    User user = dataSnapshot.getValue(User.class);
-                    Log.e(TAG,String.valueOf(user.getUserType()));
-                    userType = user.getUserType();
-                    // ...
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    // Getting Post failed, log a message
-                    Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
-                    // ...
-                }
-            };
-
+            Log.e("email", mEmail);
+            Log.e("password", mPassword);
+//            postListener =
 
             Task a = mAuth.signInWithEmailAndPassword(mEmail, mPassword)
                     .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
-
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
                                 // Sign in success, update UI with the signed-in user's information
                                 Log.e(TAG, "signInWithEmail:success");
-                                mDatabase.child("users").child(mAuth.getCurrentUser().getUid()).addListenerForSingleValueEvent(postListener);
+                                mDatabase.child("users").child(mAuth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        User user = dataSnapshot.getValue(User.class);
+                                        if (user != null) {
+                                            Log.e(TAG + " userType", String.valueOf(user.getUserType()));
+                                            userType = user.getUserType();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+                                        Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+                                    }
+                                });
                             } else {
                                 // If sign in fails, display a message to the user.
                                 Log.e(TAG, "signInWithEmail:failure", task.getException());
-//                                Toast.makeText(LoginActivity.this, "Authentication failed.",
-//                                        Toast.LENGTH_SHORT).show();
-                            }
 
-                            // ...
+                            }
                         }
                     });
 
@@ -444,22 +438,19 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                                 // Sign in success, update UI with the signed-in user's information
                                 Log.e(TAG, "createUserWithEmail:success");
                                 FirebaseUser user = mAuth.getCurrentUser();
-                                User user1 = new User(mEmail,mPassword);
-                                if(db.fnInsertUser(user1)==0){
-                                    condition=0;
-                                    Log.e(TAG,"sql database register fail");
-                                }else{
-                                    condition=4;
+                                User user1 = new User(mEmail, mPassword);
+                                if (db.fnInsertUser(user1) == 0) {
+                                    condition = 0;
+                                    Log.e(TAG, "sql database register fail");
+                                } else {
+                                    condition = 4;
                                 }
                             } else {
                                 // If sign in fails, display a message to the user.
                                 Log.e(TAG, "createUserWithEmail:failure", task.getException());
-//                                Toast.makeText(LoginActivity.this, "Authentication failed.",
-//                                        Toast.LENGTH_SHORT).show();
                             }
 
-                            // [START_EXCLUDE]
-                            // [END_EXCLUDE]
+
                         }
                     });
 
@@ -468,78 +459,52 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 // Simulate network access.
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
-                condition=0;
+                condition = 0;
                 return false;
             }
 
-            if(a.isSuccessful()){
-                Log.e("hey","sign in");
-                condition=1;
+            if (a.isSuccessful() && userType == 3) {
+                try {
+                    // Simulate network access.
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    condition = 0;
+                    return false;
+                }
+            }else if (a.isSuccessful() && userType != 3) {
+                Log.e("hey", "sign in");
+                condition = 1;
                 return true;
-            }else if(!b.isSuccessful()){
+            }else if (!b.isSuccessful()) {
                 try {
                     throw b.getException();
-                } catch(FirebaseAuthWeakPasswordException e) {
+                } catch (FirebaseAuthWeakPasswordException e) {
                     condition = 5;
                     mPasswordView.setError(getString(R.string.error_weak_password));
                     return false;
-                } catch(FirebaseAuthInvalidCredentialsException e) {
+                } catch (FirebaseAuthInvalidCredentialsException e) {
                     condition = 3;
                     mEmailView.setError(getString(R.string.error_invalid_email));
                     return false;
-                } catch(FirebaseAuthUserCollisionException e) {
+                } catch (FirebaseAuthUserCollisionException e) {
                     condition = 3;
                     mEmailView.setError(getString(R.string.error_user_exists));
                     return false;
-                } catch(Exception e) {
+                } catch (Exception e) {
                     condition = 0;
                     Log.e(TAG, e.getMessage());
                     return false;
                 }
-            }else if(b.isSuccessful()){
-                Log.e("hey","sign up");
-                condition=4;
+            } else if (b.isSuccessful()) {
+                Log.e("hey", "sign up");
+                condition = 4;
                 return true;
-            }
-            else{
-                Log.e("hey","false");
-                condition=0;
+            } else {
+                Log.e("hey", "false");
+                condition = 0;
                 return false;
             }
-
-//            for (String credential : DUMMY_CREDENTIALS) {
-//                String[] pieces = credential.split(":");
-//                if (pieces[0].equals(mEmail)) {
-//                    // Account exists, return true if the password matches.
-//                    if(pieces[1].equals(mPassword)){
-//                        condition=1;
-//                        return true;
-//                    }else{
-//                        condition=2;
-//                        mPasswordView.setError(getString(R.string.error_incorrect_password));
-//                        return false;
-//                    }
-//                }
-//            }
-
-            // TODO: register the new account here.
-//            for(User users : db.fnGetAllUser()){
-//                if(users.getUser_ID().equals(mEmail)){
-//                    condition=3;
-//                    return false;
-//                }
-//            }
-
-
-//            User user = new User(mEmail,mPassword);
-//            if(db.fnInsertUser(user)==0){
-//                condition=0;
-////                Toast.makeText(getApplicationContext(),"Register fail",Toast.LENGTH_SHORT);
-//                return false;
-//            }else{
-//                condition=4;
-//                return true;
-//            }
+            return false;
         }
 
         @Override
@@ -589,9 +554,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     Log.e("e","e");
                 }
             } else {
-//                Toast.makeText(getApplicationContext(),"Authentication fail",Toast.LENGTH_SHORT);
-//                mEmailView.requestFocus();
-//                mPasswordView.requestFocus();
             }
         }
 

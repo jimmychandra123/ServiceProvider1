@@ -8,6 +8,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -21,6 +22,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,13 +45,16 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import static android.support.design.widget.BottomSheetBehavior.STATE_COLLAPSED;
+
 public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyCallback,NavigationView.OnNavigationItemSelectedListener,GoogleMap.OnMarkerClickListener {
 
+    private RelativeLayout relativeLayout,relativeLayout2;
+    private BottomSheetBehavior bottomSheetBehavior,bottomSheetBehavior2;
     private FusedLocationProviderClient fusedLocationProviderClient;
 //    protected LocationManager locationManager;
 //    protected LocationListener locationListener;
@@ -76,20 +81,26 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.user_slide_up_panel);
+        setContentView(R.layout.activity_maps_main__t);
+
+        relativeLayout2 = findViewById(R.id.bottom_sheet2);
+        relativeLayout = findViewById(R.id.bottom_sheet);
+        bottomSheetBehavior = BottomSheetBehavior.from(relativeLayout);
+        bottomSheetBehavior2 = BottomSheetBehavior.from(relativeLayout2);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar2);
         setSupportActionBar(toolbar);
 
-        constraintLayout = findViewById(R.id.selectedServiceView);
+//        constraintLayout = findViewById(R.id.selectedServiceView);
         btnBook = findViewById(R.id.p_ServiceBook);
         p_serviceName = findViewById(R.id.p_serviceName);
         p_servicePName = findViewById(R.id.p_servicePName);
         p_serviceType = findViewById(R.id.p_serviceType);
 
-        constraintLayout.setVisibility(View.INVISIBLE);
+        relativeLayout.setVisibility(View.INVISIBLE);
 
-        final SlidingUpPanelLayout slidingUpPanelLayout = findViewById(R.id.sliding_layout);
+//        final SlidingUpPanelLayout slidingUpPanelLayout = findViewById(R.id.sliding_layout);
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout2);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this,drawer , toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -143,12 +154,12 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
                 mMap.clear();
                 db.child("Search").child("Malacca").child(search).addListenerForSingleValueEvent(postListener);
 
-                slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                bottomSheetBehavior2.setState(STATE_COLLAPSED);
             }
         });
-//        db.child("Search").child("Malacca").child("barber");
-//        if(currentLocation!=null){
-//        }
+        db.child("Search").child("Malacca").child("barber");
+        if(currentLocation!=null){
+        }
         postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -361,7 +372,7 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             user = dataSnapshot.getValue(User.class);
-                            constraintLayout.setVisibility(View.VISIBLE);
+                            relativeLayout.setVisibility(View.VISIBLE);
                             p_serviceName.setText(service.getS_name());
                             p_serviceType.setText(service.getS_type());
                             p_servicePName.setText(user.getName());

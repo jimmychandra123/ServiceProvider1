@@ -16,7 +16,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public class UserManageBookingActivity extends AppCompatActivity {
     private DatabaseReference db,db2;
@@ -41,13 +40,11 @@ public class UserManageBookingActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Get Post object and use the values to update the UI
-                Iterable<DataSnapshot> snapshotIterator = dataSnapshot.getChildren();
-                Iterator<DataSnapshot> iterator = snapshotIterator.iterator();
                 bookings = new ArrayList<>();
-                while (iterator.hasNext()) {
-                    DataSnapshot next = (DataSnapshot) iterator.next();
+                for(DataSnapshot next:dataSnapshot.getChildren()){
+                    Booking booking = next.getValue(Booking.class);
                     //getting value
-                    Booking booking = new Booking(next.child("b_id").getValue().toString(), next.child("date").getValue().toString(), next.child("time").getValue().toString(), next.child("s_id").getValue().toString(), next.child("sp_id").getValue().toString(), next.child("u_id").getValue().toString());
+//                    Booking booking = new Booking(next.child("b_id").getValue().toString(), next.child("date").getValue().toString(), next.child("time").getValue().toString(), next.child("s_id").getValue().toString(), next.child("sp_id").getValue().toString(), next.child("u_id").getValue().toString(),next.child(""));
                     Log.e(TAG, booking.getB_id());
                     bookings.add(booking);
                 }
@@ -67,8 +64,11 @@ public class UserManageBookingActivity extends AppCompatActivity {
 //                        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.screen_area,spUpdateServiceActivity).commit();
                     }
                 },0);
-                recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+                recyclerView.setLayoutManager(linearLayoutManager);
                 recyclerView.setAdapter(customAdapterBookingList);
+                linearLayoutManager.setReverseLayout(true);
+                recyclerView.scrollToPosition(bookings.size() - 1);
                 customAdapterBookingList.notifyDataSetChanged();
 
             }

@@ -114,9 +114,12 @@ public class UserMessageActivity extends AppCompatActivity {
                         messages.add(message);
                     }
                 }
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+//                linearLayoutManager.setReverseLayout(true);
                 MessageAdapter messageAdapter = new MessageAdapter(messages);
-                recyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                recyclerView.setLayoutManager(linearLayoutManager);
                 recyclerView.setAdapter(messageAdapter);
+                recyclerView.scrollToPosition(messages.size() - 1);
                 messageAdapter.notifyDataSetChanged();
             }
 

@@ -43,6 +43,7 @@
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginBottom="56dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
@@ -51,45 +52,28 @@
             android:layout_marginTop="0dp"
             tools:context=".MapsMainActivity_T" />
 
-        <!--<EditText-->
-            <!--android:id="@+id/editQuery2"-->
+        <!--<include-->
+            <!--layout="@layout/service_profile"-->
             <!--android:layout_width="wrap_content"-->
             <!--android:layout_height="wrap_content"-->
-            <!--android:layout_alignParentTop="true"-->
-            <!--android:layout_alignParentEnd="true"-->
-            <!--android:layout_alignParentRight="true"-->
-            <!--android:layout_marginStart="44dp"-->
-            <!--android:layout_marginLeft="44dp"-->
-            <!--android:layout_marginTop="8dp"-->
-            <!--android:background="@android:drawable/editbox_background"-->
-            <!--android:ems="10"-->
-            <!--android:hint="Search"-->
-            <!--android:inputType="textPersonName"-->
-            <!--app:layout_constraintStart_toStartOf="parent"-->
-            <!--app:layout_constraintTop_toTopOf="parent" />-->
-
-        <!--<ImageButton-->
-            <!--android:id="@+id/searchButton2"-->
-            <!--android:layout_width="46dp"-->
-            <!--android:layout_height="49dp"-->
-            <!--android:layout_alignParentTop="true"-->
-            <!--android:layout_alignParentEnd="true"-->
-            <!--android:layout_alignParentRight="true"-->
-            <!--android:layout_marginStart="8dp"-->
-            <!--android:layout_marginLeft="8dp"-->
-            <!--android:layout_marginTop="8dp"-->
-            <!--app:layout_constraintStart_toEndOf="@+id/editQuery2"-->
-            <!--app:layout_constraintTop_toTopOf="@+id/map"-->
-            <!--app:srcCompat="@drawable/ic_search" />-->
-
-        <include
-            layout="@layout/service_profile"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            <!--app:layout_constraintBottom_toBottomOf="parent"-->
+            <!--app:layout_constraintStart_toStartOf="parent" />-->
 
     </android.support.constraint.ConstraintLayout>
+
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <include
+            layout="@layout/bottom_sheet2"/>
+    </android.support.design.widget.CoordinatorLayout>
+
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <include
+            layout="@layout/bottom_sheet"/>
+    </android.support.design.widget.CoordinatorLayout>
 
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_view2"
