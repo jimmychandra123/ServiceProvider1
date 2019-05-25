@@ -2,6 +2,7 @@ package com.example.fungus.serviceprovider1;
 
 import android.app.ActivityManager;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ComponentName;
@@ -57,11 +58,11 @@ public class NotificationUtils {
                         mContext,
                         0,
                         intent,
-                        PendingIntent.FLAG_CANCEL_CURRENT
+                        PendingIntent.FLAG_UPDATE_CURRENT
                 );
 
         final NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
-                mContext);
+                mContext,"FirstFCM");
 
         final Uri alarmSound = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE
                 + "://" + mContext.getPackageName() + "/raw/notification");
@@ -87,12 +88,61 @@ public class NotificationUtils {
 
     private void showSmallNotification(NotificationCompat.Builder mBuilder, int icon, String title, String message, String timeStamp, PendingIntent resultPendingIntent, Uri alarmSound) {
 
+        //1. Define the NotificationChannel
+//        NotificationChannel ncEmpty = null;
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            ncEmpty = new NotificationChannel("FirstFCM", "First App With FCM", NotificationManager.IMPORTANCE_DEFAULT);
+//        }
+//        //2. Set which activity that will opened when user click on the notification.
+//                Intent notiIntent = new Intent(mContext,TestActivity.class);
+//
+//                //3. Add the intent into TaskStackBuilder
+//        TaskStackBuilder stackBuilder = null;
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+//            stackBuilder = TaskStackBuilder.create(mContext);
+//        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+//            stackBuilder.addNextIntent(notiIntent);
+//        }
+//        //4. Define PendingIntent
+//        PendingIntent pendingIntent = null;
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+//            pendingIntent = stackBuilder.getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);
+//        }
+//        //5. Define the NotificationCompat and the messages content
+//                NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext,"FirstFCM");
+//                builder.setContentIntent(pendingIntent).
+//                        setContentTitle(title).
+//                        setContentText(message).
+//                        setSmallIcon(R.drawable.ic_home).setAutoCancel(true);
+////6. Define and call NotificationManager that the app is going to perform push notification
+//                NotificationManager manager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+//                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+//                {
+//                    manager.createNotificationChannel(ncEmpty);
+//                }
+//                manager.notify(0,builder.build());
+
+
+
+        NotificationChannel ncEmpty = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            ncEmpty = new NotificationChannel("FirstFCM", "First App With FCM", NotificationManager.IMPORTANCE_DEFAULT);
+        }
+//        TaskStackBuilder stackBuilder = null;
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+//            stackBuilder = TaskStackBuilder.create(mContext);
+//        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+//            stackBuilder.addNextIntent(intent);
+//        }
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
 
         inboxStyle.addLine(message);
-
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext,"FirstFCM");
         Notification notification;
-        notification = mBuilder.setSmallIcon(icon).setTicker(title).setWhen(0)
+        notification = mBuilder
+                .setSmallIcon(icon).setTicker(title).setWhen(0)
                 .setAutoCancel(true)
                 .setContentTitle(title)
                 .setContentIntent(resultPendingIntent)
@@ -100,11 +150,14 @@ public class NotificationUtils {
                 .setStyle(inboxStyle)
                 .setWhen(getTimeMilliSec(timeStamp))
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setLargeIcon(BitmapFactory.decodeResource(mContext.getResources(), icon))
                 .setContentText(message)
                 .build();
 
         NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            notificationManager.createNotificationChannel(ncEmpty);
+        }
         notificationManager.notify(Config.NOTIFICATION_ID, notification);
     }
 

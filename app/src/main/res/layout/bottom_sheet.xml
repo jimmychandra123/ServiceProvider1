@@ -49,4 +49,14 @@
         android:layout_marginTop="10dp"
         android:text="Book" />
 
+    <RatingBar
+        android:id="@+id/ratingBarService"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/p_serviceType"
+        android:layout_centerInParent="true"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_marginTop="8dp" />
+
 </RelativeLayout>

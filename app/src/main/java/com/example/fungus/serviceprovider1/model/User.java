@@ -6,11 +6,20 @@ public class User {
     String user_Password;
     String name;
     int userType;
+    String contact;
 
     public User() {
     }
 
-    public User(String id,String user_email,String name,int userType){
+    public User(String id, String user_email, String name, int userType, String contact) {
+        this.id = id;
+        this.user_email = user_email;
+        this.name = name;
+        this.userType = userType;
+        this.contact = contact;
+    }
+
+    public User(String id, String user_email, String name, int userType){
         this.id = id;
         this.user_email = user_email;
         this.name = name;
@@ -20,6 +29,14 @@ public class User {
     public User(String user_email, String user_Password) {
         this.user_email = user_email;
         this.user_Password = user_Password;
+    }
+
+    public String getContact() {
+        return contact;
+    }
+
+    public void setContact(String contact) {
+        this.contact = contact;
     }
 
     public int getUserType() {

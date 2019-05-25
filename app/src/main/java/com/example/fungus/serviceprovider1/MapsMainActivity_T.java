@@ -22,10 +22,12 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.fungus.serviceprovider1.model.Rating;
 import com.example.fungus.serviceprovider1.model.Service;
 import com.example.fungus.serviceprovider1.model.User;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -48,15 +50,16 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import static android.support.design.widget.BottomSheetBehavior.STATE_COLLAPSED;
 
-public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyCallback,NavigationView.OnNavigationItemSelectedListener,GoogleMap.OnMarkerClickListener {
+public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener, GoogleMap.OnMarkerClickListener {
 
-    private RelativeLayout relativeLayout,relativeLayout2;
-    private BottomSheetBehavior bottomSheetBehavior,bottomSheetBehavior2;
+    private RelativeLayout relativeLayout, relativeLayout2;
+    private BottomSheetBehavior bottomSheetBehavior, bottomSheetBehavior2;
     private FusedLocationProviderClient fusedLocationProviderClient;
-//    protected LocationManager locationManager;
+    //    protected LocationManager locationManager;
 //    protected LocationListener locationListener;
     private GoogleMap mMap;
     private static final int LOCATION_REQUEST = 500;
@@ -73,10 +76,14 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
     private Marker marker;
 
     private Button btnBook;
-    private TextView p_serviceName,p_servicePName,p_serviceType;
+    private TextView p_serviceName, p_servicePName, p_serviceType;
     private ConstraintLayout constraintLayout;
     private User user;
-    String sp_id,s_id,s_name=null;
+    String sp_id, s_id, s_name = null;
+    RatingBar rb;
+    float ratingValue;
+    List<Rating> ratingList;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,14 +103,17 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
         p_serviceName = findViewById(R.id.p_serviceName);
         p_servicePName = findViewById(R.id.p_servicePName);
         p_serviceType = findViewById(R.id.p_serviceType);
+        rb = (RatingBar) findViewById(R.id.ratingBarService);
+        ratingList = new ArrayList<>();
 
         relativeLayout.setVisibility(View.INVISIBLE);
+
 
 //        final SlidingUpPanelLayout slidingUpPanelLayout = findViewById(R.id.sliding_layout);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout2);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this,drawer , toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
@@ -120,10 +130,8 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        fetchLastLocation();
 
-
-        sharedPreferences = getApplicationContext().getSharedPreferences("authentication",0);
+        sharedPreferences = getApplicationContext().getSharedPreferences("authentication", 0);
         editor = sharedPreferences.edit();
 
         mAuth = FirebaseAuth.getInstance();
@@ -132,21 +140,21 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
         btnBook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(sp_id!=null&&s_id!=null&&s_name!=null){
-                    Intent intent = new Intent(getApplicationContext(),UserBookServiceActivity.class);
-                    intent.putExtra("sp_id",sp_id);
-                    intent.putExtra("s_id",s_id);
-                    intent.putExtra("s_name",s_name);
+                if (sp_id != null && s_id != null && s_name != null) {
+                    Intent intent = new Intent(getApplicationContext(), UserBookServiceActivity.class);
+                    intent.putExtra("sp_id", sp_id);
+                    intent.putExtra("s_id", s_id);
+                    intent.putExtra("s_name", s_name);
                     startActivity(intent);
-                }else{
-                    Toast.makeText(getApplicationContext(),"Pick a service!",Toast.LENGTH_SHORT);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Pick a service!", Toast.LENGTH_SHORT);
                 }
             }
         });
 
-        final String [] searchArray = getResources().getStringArray(R.array.search_service);
+        final String[] searchArray = getResources().getStringArray(R.array.search_service);
         ListView listView = findViewById(R.id.contentListView);
-        listView.setAdapter(new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1,searchArray));
+        listView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, searchArray));
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -158,7 +166,7 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
             }
         });
         db.child("Search").child("Malacca").child("barber");
-        if(currentLocation!=null){
+        if (currentLocation != null) {
         }
         postListener = new ValueEventListener() {
             @Override
@@ -169,12 +177,12 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
                 while (iterator.hasNext()) {
                     DataSnapshot next = (DataSnapshot) iterator.next();
                     //getting value
-                    Service service = new Service(next.child("s_id").getValue().toString(), Double.valueOf(next.child("s_latitude").getValue().toString()),Double.valueOf(next.child("s_longitude").getValue().toString()),next.child("s_name").getValue().toString(),next.child("s_state").getValue().toString(),next.child("s_type").getValue().toString(),next.child("sp_id").getValue().toString());
+                    Service service = new Service(next.child("s_id").getValue().toString(), Double.valueOf(next.child("s_latitude").getValue().toString()), Double.valueOf(next.child("s_longitude").getValue().toString()), next.child("s_name").getValue().toString(), next.child("s_state").getValue().toString(), next.child("s_type").getValue().toString(), next.child("sp_id").getValue().toString());
 //                    services.add(next.getValue(Service.class));
                     Location serviceLocation = new Location(currentLocation);
                     serviceLocation.setLatitude(service.getS_latitude());
                     serviceLocation.setLongitude(service.getS_longitude());
-                    double distance = fnCalculateDistance(currentLocation,serviceLocation);
+                    double distance = fnCalculateDistance(currentLocation, serviceLocation);
 //                    distances.add(distance);
                     service.setDistance(distance);
                     services.add(service);
@@ -183,7 +191,7 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
 //                    Log.e(TAG, "Value = " + next.child("s_name").getValue());
                 }
 
-                quickSort(services,0,services.size()-1);
+                quickSort(services, 0, services.size() - 1);
                 //stupid sort
 //                for(int j=0;j<services.size();j++){
 //                    if(j+1<services.size()){
@@ -195,15 +203,15 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
 //                    }
 //                }
 
-                for(Service service : services){
-                    Log.e(TAG,String.valueOf(service.getDistance()));
-                    Log.e(TAG,service.getS_name());
+                for (Service service : services) {
+                    Log.e(TAG, String.valueOf(service.getDistance()));
+                    Log.e(TAG, service.getS_name());
                 }
 
-                for(int i=0;i<services.size();i++){
-                    if(i>10){
+                for (int i = 0; i < services.size(); i++) {
+                    if (i > 10) {
                         break;
-                    }else{
+                    } else {
                         marker = mMap.addMarker(new MarkerOptions().position(new LatLng(services.get(i).getS_latitude(), services.get(i).getS_longitude())).title(services.get(i).getS_name()));
                         marker.setTag(services.get(i).getS_id());
                     }
@@ -227,42 +235,56 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
                 // ...
             }
         };
+        rb.setStepSize(1.0f);
+        rb.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float v, boolean b) {
+                rb.setStepSize(1.0f);
+//                startAvr.setText(String.valueOf(v));
+                if(b) {
+                    ratingValue = v;
+                    Log.e("e", String.valueOf(ratingValue));
+                    addRating();
+                }
+            }
+        });
+
     }
 
     public void quickSort(ArrayList<Service> arr, int begin, int end) {
         if (begin < end) {
             int partitionIndex = partition(arr, begin, end);
 
-            quickSort(arr, begin, partitionIndex-1);
-            quickSort(arr, partitionIndex+1, end);
+            quickSort(arr, begin, partitionIndex - 1);
+            quickSort(arr, partitionIndex + 1, end);
         }
     }
 
     private int partition(ArrayList<Service> arr, int begin, int end) {
         double pivot = arr.get(end).getDistance();
-        int i = (begin-1);
+        int i = (begin - 1);
 
         for (int j = begin; j < end; j++) {
             if (arr.get(j).getDistance() <= pivot) {
                 i++;
                 Service swapTemp = arr.get(i);
-                arr.set(i,arr.get(j));
-                arr.set(j,swapTemp);
+                arr.set(i, arr.get(j));
+                arr.set(j, swapTemp);
             }
         }
 
-        Service swapTemp = arr.get(i+1);
-        arr.set(i+1,arr.get(end));
-        arr.set(end,swapTemp);
+        Service swapTemp = arr.get(i + 1);
+        arr.set(i + 1, arr.get(end));
+        arr.set(end, swapTemp);
 
-        return i+1;
+        return i + 1;
     }
 
-    public double rad(double x){
+    public double rad(double x) {
         return x * Math.PI / 180;
     }
 
-    public double fnCalculateDistance(Location p1,Location p2){
+    public double fnCalculateDistance(Location p1, Location p2) {
         int R = 6378137; // Earth’s mean radius in meter
         double dLat = rad(p2.getLatitude() - p1.getLatitude());
         double dLong = rad(p2.getLongitude() - p1.getLongitude());
@@ -274,7 +296,17 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
         return d; // returns the distance in meter
     }
 
-    private void fetchLastLocation(){
+    private void fetchLastLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         Task<Location> task = fusedLocationProviderClient.getLastLocation();
         task.addOnSuccessListener(new OnSuccessListener<Location>() {
             @Override
@@ -314,7 +346,7 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
         }
         mMap.setMyLocationEnabled(true);
         mMap.setOnMarkerClickListener(this);
-
+        fetchLastLocation();
 
 //        if (mMap != null) {
 ////            Location arg0 = mMap.getMyLocation();
@@ -379,6 +411,7 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
                             sp_id = service.getSp_id();
                             s_id =  service.getS_id();
                             s_name = service.getS_name();
+                            calculateAvr();
                         }
 
                         @Override
@@ -393,5 +426,50 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
             }
         }
         return false;
+    }
+
+    private void addRating(){
+        String id = db.child("Rating").child(s_id).push().getKey();
+        Rating rating = new Rating(id,s_id,ratingValue);
+        db.child("Rating").child(s_id).child(id).setValue(rating);
+
+        Toast.makeText(this,"Rating Submitted",Toast.LENGTH_SHORT).show();
+        calculateAvr();
+    }
+
+    protected void calculateAvr(){
+        db.child("Rating").child(s_id).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                float avr = 0.0f;
+                float sum = 0.0f;
+                int count=0;
+                ratingList.clear();
+                for(DataSnapshot ratingSnapShot : dataSnapshot.getChildren()){
+                    Rating rating = ratingSnapShot.getValue(Rating.class);
+                    ratingList.add(rating);
+                }
+                for(int i=0;i<ratingList.size();i++){
+                    if(ratingList.get(i).getService_id().equals(s_id)){
+                        sum += ratingList.get(i).getRatingValue();
+                        count++;
+                    }
+                }
+                avr = sum/count;
+                String test = String.format("%.02f", avr);
+//                RatingList adapter = new RatingList(Main2Activity.this,ratingList);
+//                listView.setAdapter(adapter);
+//                amtReview.setText(Integer.toString(count)+" reviewed");
+//                textView2.setText(test);
+                rb.setStepSize(0.01f);
+                rb.setRating(avr);
+//                ratingValue = avr;
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 }

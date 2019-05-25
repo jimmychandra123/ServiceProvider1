@@ -38,11 +38,43 @@
 
     </android.support.design.widget.CoordinatorLayout>
 
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/coodLay1"
+        android:id="@+id/layoutMessageBooking">
+    <include
+
+        layout="@layout/booking_list_item"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/layoutBooking"
+         />
+        <Button
+            android:layout_marginTop="35dp"
+            android:layout_marginRight="10dp"
+            android:background="@android:color/holo_green_light"
+            android:id="@+id/btnConfirm"
+            android:text="Confirm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+        <Button
+            android:layout_marginTop="35dp"
+            android:layout_marginRight="10dp"
+            android:background="@android:color/holo_red_light"
+            android:id="@+id/btnCancel"
+            android:text="Cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/btnConfirm" />
+    </RelativeLayout>
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/messageList"
-        android:layout_below="@+id/coodLay1"
+        android:layout_below="@+id/layoutMessageBooking"
         android:layout_above="@+id/messageLayoutBottom"/>
 
     <RelativeLayout

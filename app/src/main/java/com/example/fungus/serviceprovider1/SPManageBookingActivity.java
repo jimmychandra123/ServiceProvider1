@@ -13,6 +13,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -59,6 +60,7 @@ public class SPManageBookingActivity extends AppCompatActivity {
                         Intent intent = new Intent(getApplicationContext(),UserMessageActivity.class);
                         intent.putExtra("id",u_id);
                         intent.putExtra("b_id",b_id);
+                        intent.putExtra("user_type","1");
                         startActivity(intent);
 //                        Bundle bundle = new Bundle();
 //                        bundle.putString("s_id", i);
@@ -84,6 +86,6 @@ public class SPManageBookingActivity extends AppCompatActivity {
             }
         };
         Log.e("e",u_id);
-        db.child("S_Book").child(u_id).addValueEventListener(postListener);
-    }
+        Query query = db.child("Booking").orderByChild("sp_id").equalTo(u_id) ;
+        query.addValueEventListener(postListener);    }
 }

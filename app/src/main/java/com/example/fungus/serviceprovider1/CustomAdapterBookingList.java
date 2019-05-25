@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.fungus.serviceprovider1.model.Booking;
+import com.example.fungus.serviceprovider1.model.Service;
 import com.example.fungus.serviceprovider1.model.User;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -22,6 +23,8 @@ public class CustomAdapterBookingList extends RecyclerView.Adapter<CustomAdapter
     List<Booking> listBooking;
     OnItemClickListener listener;
     int userType;
+    DatabaseReference db;
+    User user;
 
     public CustomAdapterBookingList(List<Booking> listBooking, OnItemClickListener listener,int userType) {
         this.listBooking = listBooking;
@@ -41,17 +44,29 @@ public class CustomAdapterBookingList extends RecyclerView.Adapter<CustomAdapter
     @Override
     public void onBindViewHolder(@NonNull final CustomAdapterBookingList.ViewHolder holder, final int position) {
         holder.bind(listBooking.get(position),listener);
-        DatabaseReference db = FirebaseDatabase.getInstance().getReference();
+        db = FirebaseDatabase.getInstance().getReference();
         if(userType==0) {
             db.child("users").child(listBooking.get(position).getSp_id()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    User user = dataSnapshot.getValue(User.class);
+                    user = dataSnapshot.getValue(User.class);
                     Booking booking = listBooking.get(position);
                     holder.txtName.setText(user.getName());
                     holder.txtDate.setText(String.valueOf(booking.getDate()));
                     holder.txtTime.setText(booking.getTime());
                     holder.txtStatus.setText(booking.getStatus());
+                    db.child("Service").child(listBooking.get(position).getSp_id()).child(listBooking.get(position).getS_id()).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Service service = dataSnapshot.getValue(Service.class);
+                            holder.txtName.setText(user.getName()+" - "+service.getS_name());
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
 
                 }
 
@@ -64,12 +79,24 @@ public class CustomAdapterBookingList extends RecyclerView.Adapter<CustomAdapter
             db.child("users").child(listBooking.get(position).getU_id()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    User user = dataSnapshot.getValue(User.class);
+                    user = dataSnapshot.getValue(User.class);
                     Booking booking = listBooking.get(position);
                     holder.txtName.setText(user.getName());
                     holder.txtDate.setText(String.valueOf(booking.getDate()));
                     holder.txtTime.setText(booking.getTime());
                     holder.txtStatus.setText(booking.getStatus());
+                    db.child("Service").child(listBooking.get(position).getSp_id()).child(listBooking.get(position).getS_id()).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Service service = dataSnapshot.getValue(Service.class);
+                            holder.txtName.setText(user.getName()+" - "+service.getS_name());
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
                 }
 
                 @Override

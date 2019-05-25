@@ -16,6 +16,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
+        android:usesCleartextTraffic="true"
         android:networkSecurityConfig="@xml/network_security"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -28,7 +29,11 @@
 
         </activity>
         <activity android:name=".LoginActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <!-- <activity -->
         <!-- android:name=".MenuActivity" -->
@@ -63,16 +68,13 @@
         <activity
             android:name=".MapsMainActivity_T"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".RegisterActivity" />
+        <activity android:name=".RegisterActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".SPMenuActivity_T2" />
         <activity
             android:name=".TestActivity"
             >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity android:name=".UserBookServiceActivity" />
         <activity android:name=".UserManageBookingActivity" />

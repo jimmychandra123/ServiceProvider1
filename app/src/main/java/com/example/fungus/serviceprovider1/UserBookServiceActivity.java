@@ -112,36 +112,15 @@ public class UserBookServiceActivity extends AppCompatActivity {
         databaseReference.child("Booking").child(id).setValue(booking).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                databaseReference.child("U_Book").child(u_id).child(id).setValue(booking).addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        databaseReference.child("S_Book").child(sp_id).child(id).setValue(booking).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                makeMessage("Booking Added");
-                                startActivity(intent2);
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                makeMessage("S_Book Failed");
-                            }
-                        });
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        makeMessage("U_Book Failed");
-                    }
-                });
+                makeMessage("Booking Added");
+                startActivity(intent2);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                makeMessage("Failed");
+                makeMessage("S_Book Failed");
             }
-        })
-        ;
+        });
 
     }
 
