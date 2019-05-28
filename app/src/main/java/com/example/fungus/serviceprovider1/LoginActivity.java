@@ -4,8 +4,11 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -17,6 +20,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -46,6 +50,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,6 +78,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
+    private BroadcastReceiver mRegistrationBroadcastReceiver;
 
     // UI references.
     private AutoCompleteTextView mEmailView;
@@ -88,6 +94,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private DatabaseReference mDatabase;
     ValueEventListener postListener;
     private String id;
+    private int userType = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,7 +107,22 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         populateAutoComplete();
         mPasswordView = (EditText) findViewById(R.id.password);
 
+        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
 
+                // checking for type intent filter
+                if (intent.getAction().equals(Config.REGISTRATION_COMPLETE)) {
+                    // gcm successfully registered
+                    // now subscribe to `global` topic to receive app wide notifications
+                    FirebaseMessaging.getInstance().subscribeToTopic(Config.TOPIC_GLOBAL);
+
+
+                } else if (intent.getAction().equals(Config.PUSH_NOTIFICATION)) {
+                    // new push notification is received
+                }
+            }
+        };
 
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -147,7 +169,43 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         sharedPreferences = getApplicationContext().getSharedPreferences("authentication",0);
         Log.e("Check Sign In",Boolean.toString(sharedPreferences.contains("authentication")));
         if(!(sharedPreferences.getString("user_id",null)==null)){
-            attemptLoginOnCreate();
+            showProgress(true);
+            String id = mAuth.getCurrentUser().getUid();
+
+
+            mDatabase.child("users").child(mAuth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    User user = dataSnapshot.getValue(User.class);
+                    if (user != null) {
+                        Log.e(TAG + " userType", String.valueOf(user.getUserType()));
+                        userType = user.getUserType();
+                        SharedPreferences pref = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, 0);
+                        String regId = pref.getString("regId", null);
+                        if (!TextUtils.isEmpty(regId))
+                            mDatabase.child("users").child(mAuth.getCurrentUser().getUid()).child("regID").setValue(regId);
+                        else
+                            Toast.makeText(getApplicationContext(),"Firebase Reg Id is not received yet!",Toast.LENGTH_SHORT).show();
+                        showProgress(false);
+                        if(userType==2){
+                            startActivity( new Intent(LoginActivity.this,MapsMainActivity_T.class));
+                            finish();
+                        }else if(userType == 1) {
+                            Log.e("usertype", "1");
+                            startActivity(new Intent(LoginActivity.this, SPNavigationDrawerActivity.class));
+                            finish();
+                        }else if(userType == 0){
+                            startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+                            finish();
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+                }
+            });
         }
         editor = sharedPreferences.edit();
     }
@@ -410,6 +468,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                                 mDatabase.child("users").child(mAuth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
+                                        SharedPreferences pref = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, 0);
+                                        String regId = pref.getString("regId", null);
+                                        if (!TextUtils.isEmpty(regId))
+                                            mDatabase.child("users").child(mAuth.getCurrentUser().getUid()).child("regID").setValue(regId);
+                                        else
+                                            Toast.makeText(getApplicationContext(),"Firebase Reg Id is not received yet!",Toast.LENGTH_SHORT).show();
                                         User user = dataSnapshot.getValue(User.class);
                                         if (user != null) {
                                             Log.e(TAG + " userType", String.valueOf(user.getUserType()));
@@ -437,7 +501,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             if (task.isSuccessful()) {
                                 // Sign in success, update UI with the signed-in user's information
                                 Log.e(TAG, "createUserWithEmail:success");
-                                FirebaseUser user = mAuth.getCurrentUser();
+                                String user = mAuth.getCurrentUser().getUid();
                                 User user1 = new User(mEmail, mPassword);
                                 if (db.fnInsertUser(user1) == 0) {
                                     condition = 0;
@@ -463,15 +527,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 return false;
             }
 
-            if (a.isSuccessful() && userType == 3) {
-                try {
-                    // Simulate network access.
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    condition = 0;
-                    return false;
-                }
-            }else if (a.isSuccessful() && userType != 3) {
+            if (a.isSuccessful() && userType != 3) {
                 Log.e("hey", "sign in");
                 condition = 1;
                 return true;
@@ -504,7 +560,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 condition = 0;
                 return false;
             }
-            return false;
         }
 
         @Override
@@ -538,12 +593,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 editor.putString("user_id",mEmail);
                 editor.putString("password",mPassword);
                 editor.commit();
-                if(condition==4){
+                if(condition==4 || userType == 0){
                     Log.e("e","4");
                     startActivity(new Intent(LoginActivity.this,RegisterActivity.class));
                     finish();
-                }else if(userType == 0){
-                    Log.e("usertype","0");
+                }else if(userType == 2){
+                    Log.e("usertype","2");
                     startActivity( new Intent(LoginActivity.this,MapsMainActivity_T.class));
                     finish();
                 }else if(userType == 1){
@@ -562,6 +617,29 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mAuthTask = null;
             showProgress(false);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // register GCM registration complete receiver
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Config.REGISTRATION_COMPLETE));
+
+        // register new push message receiver
+        // by doing this, the activity will be notified each time a new message arrives
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(Config.PUSH_NOTIFICATION));
+
+        // clear the notification area when the app is opened
+        NotificationUtils.clearNotifications(getApplicationContext());
+    }
+
+    @Override
+    protected void onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+        super.onPause();
     }
 
 

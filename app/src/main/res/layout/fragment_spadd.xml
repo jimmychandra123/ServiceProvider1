@@ -1,39 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SPAddServiceActivity">
 
-    <!-- TODO: Update blank fragment layout -->
+    <include layout="@layout/toolbar"
+        android:id="@+id/layoutToolbar2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:textColor="@color/white"
+        android:id="@+id/btnAddS"
+        android:text="NEXT"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:layout_alignRight="@+id/layoutToolbar2" />
 
     <EditText
         android:id="@+id/addSName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="240dp"
+        android:layout_below="@+id/layoutToolbar2"
         android:ems="10"
         android:hint="Service Name"
-        android:inputType="textPersonName" />
-
-    <fragment
-        android:id="@+id/addSMap"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="200dp" />
-
-    <Button
-        android:id="@+id/btnAddS"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="390dp"
-        android:text="Add" />
+        android:inputType="textPersonName"
+        android:layout_marginTop="8dp"/>
 
     <TextView
         android:id="@+id/txtAddState"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="300dp"
+        android:layout_below="@+id/addSName"
+        android:layout_marginTop="10dp"
         android:text="Pick a state"
         android:textSize="24sp" />
 
@@ -41,15 +42,18 @@
         android:id="@+id/btnAddState"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="200dp"
-        android:layout_marginTop="290dp"
-        android:text="Pick State" />
+        android:text="Pick State"
+        android:layout_below="@+id/addSName"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="8dp"/>
 
     <TextView
         android:id="@+id/txtAddType"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="350dp"
+        android:layout_below="@+id/txtAddState"
+        android:layout_marginTop="10dp"
         android:text="Pick a type"
         android:textSize="24sp" />
 
@@ -57,7 +61,92 @@
         android:id="@+id/btnAddType"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="200dp"
-        android:layout_marginTop="340dp"
-        android:text="Pick Type" />
-</FrameLayout>
+        android:layout_below="@+id/btnAddState"
+        android:text="Pick Type"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="8dp"
+        android:layout_alignParentEnd="true" />
+
+    <android.support.design.widget.TextInputLayout
+        android:gravity="left"
+        android:layout_below="@+id/txtAddType"
+        android:id="@+id/textInputNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp">
+
+        <EditText
+            android:id="@+id/number"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:hint="NO"
+            android:imeOptions="actionUnspecified"
+            android:inputType="textPersonName"
+            android:maxLines="1"
+            android:singleLine="true" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:gravity="left"
+        android:id="@+id/textInputStreetNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/textInputNumber"
+        android:layout_toEndOf="@+id/textInputNumber"
+        android:layout_below="@+id/txtAddType"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp">
+
+        <EditText
+            android:id="@+id/streetNumber"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:hint="Street Number"
+            android:imeOptions="actionUnspecified"
+            android:inputType="textPersonName"
+            android:maxLines="1"
+            android:singleLine="true" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:gravity="left"
+        android:id="@+id/textInputStreetName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textInputNumber"
+        android:layout_marginTop="8dp">
+
+        <EditText
+            android:id="@+id/streetName"
+            android:layout_width="288dp"
+            android:layout_height="wrap_content"
+            android:hint="Street Name"
+            android:imeOptions="actionUnspecified"
+            android:inputType="textPersonName"
+            android:maxLines="1"
+            android:singleLine="true" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:gravity="left"
+        android:id="@+id/textInputPostcode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textInputStreetName"
+        android:layout_marginTop="8dp">
+
+        <EditText
+            android:id="@+id/postCode"
+            android:layout_width="288dp"
+            android:layout_height="wrap_content"
+            android:hint="Post Code and City Name"
+            android:imeOptions="actionUnspecified"
+            android:inputType="textPersonName"
+            android:maxLines="1"
+            android:singleLine="true" />
+
+    </android.support.design.widget.TextInputLayout>
+</RelativeLayout>

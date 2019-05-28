@@ -7,16 +7,26 @@ public class User {
     String name;
     int userType;
     String contact;
+    String regID;
 
     public User() {
     }
 
-    public User(String id, String user_email, String name, int userType, String contact) {
+    public User(String id, String user_email, String name, int userType, String contact, String regID) {
         this.id = id;
         this.user_email = user_email;
         this.name = name;
         this.userType = userType;
         this.contact = contact;
+        this.regID = regID;
+    }
+
+    public String getRegID() {
+        return regID;
+    }
+
+    public void setRegID(String regID) {
+        this.regID = regID;
     }
 
     public User(String id, String user_email, String name, int userType){

@@ -114,6 +114,7 @@ public class UserBookServiceActivity extends AppCompatActivity {
             public void onSuccess(Void aVoid) {
                 makeMessage("Booking Added");
                 startActivity(intent2);
+                finish();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override

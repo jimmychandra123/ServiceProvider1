@@ -19,7 +19,7 @@ import android.view.View;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class SPNavigationDrawerActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,SPMenuActivity.OnFragmentInteractionListener,SPAddServiceActivity.OnFragmentInteractionListener,SPUpdateServiceActivity.OnFragmentInteractionListener {
+        implements NavigationView.OnNavigationItemSelectedListener,SPMenuActivity.OnFragmentInteractionListener {
 
     private FirebaseAuth mAuth;
     SharedPreferences sharedPreferences;
@@ -42,9 +42,10 @@ public class SPNavigationDrawerActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(),SPAddServiceActivity.class));
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
-                getSupportFragmentManager().beginTransaction().replace(R.id.screen_area,new SPAddServiceActivity()).commit();
+//                getSupportFragmentManager().beginTransaction().replace(R.id.screen_area,new SPAddServiceActivity()).commit();
             }
         });
 
@@ -109,6 +110,8 @@ public class SPNavigationDrawerActivity extends AppCompatActivity
             finish();
         }else if(id == R.id.nav_booking){
             startActivity(new Intent(SPNavigationDrawerActivity.this, SPManageBookingActivity.class)); //Go to booking page
+        }else if(id == R.id.nav_report){
+            startActivity(new Intent(SPNavigationDrawerActivity.this, ReportGraph.class)); //Go to booking page
         }
 
         if (fragment != null){

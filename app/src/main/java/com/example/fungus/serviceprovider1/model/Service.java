@@ -12,6 +12,10 @@ public class Service {
     String s_type;
     double distance;
     String sp_id;
+    String number;
+    String streetNumber;
+    String streetName;
+    String postCode;
 
 
     public Service(String s_id, double s_latitude, double s_longitude, String s_name, String s_state, String s_type, String sp_id) {
@@ -34,6 +38,59 @@ public class Service {
         this.s_name = s_name;
         this.s_state = s_state;
         this.s_type = s_type;
+    }
+
+    //for ServiceAdd
+    public Service(String s_id, String s_name, String s_state, String s_type,String sp_id,String number,String streetNumber,String streetName,String postCode) {
+        this.s_id = s_id;
+        this.s_name = s_name;
+        this.s_state = s_state;
+        this.s_type = s_type;
+        this.sp_id = sp_id;
+        this.number = number;
+        this.streetName = streetName;
+        this.streetNumber = streetNumber;
+        this.postCode = postCode;
+    }
+
+    public Service(String s_id, String s_name, String s_state, String address, String s_type) {
+        this.s_id = s_id;
+        this.s_name = s_name;
+        this.s_state = s_state;
+        this.address = address;
+        this.s_type = s_type;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
+    }
+
+    public String getStreetNumber() {
+        return streetNumber;
+    }
+
+    public void setStreetNumber(String streetNumber) {
+        this.streetNumber = streetNumber;
+    }
+
+    public String getStreetName() {
+        return streetName;
+    }
+
+    public void setStreetName(String streetName) {
+        this.streetName = streetName;
+    }
+
+    public String getPostCode() {
+        return postCode;
+    }
+
+    public void setPostCode(String postCode) {
+        this.postCode = postCode;
     }
 
     public String getSp_id() {

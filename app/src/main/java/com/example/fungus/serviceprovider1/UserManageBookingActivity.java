@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import com.example.fungus.serviceprovider1.model.Booking;
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,12 +28,14 @@ public class UserManageBookingActivity extends AppCompatActivity {
     private String TAG = "SPMenuActivity";
     private ArrayList<Booking> bookings;
     private RecyclerView recyclerView;
+    private TextView resultText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_manage_booking);
 
+        resultText = findViewById(R.id.resultText);
         recyclerView = findViewById(R.id.listManageBookingView);
         db = FirebaseDatabase.getInstance().getReference();
         auth = FirebaseAuth.getInstance();
@@ -49,6 +53,8 @@ public class UserManageBookingActivity extends AppCompatActivity {
                     Log.e(TAG, booking.getB_id());
                     bookings.add(booking);
                 }
+                if(bookings.size()!=0)
+                    resultText.setVisibility(View.INVISIBLE);
                 CustomAdapterBookingList customAdapterBookingList = new CustomAdapterBookingList(bookings, new CustomAdapterBookingList.OnItemClickListener() {
                     @Override
                     public void onItemClick(Booking item) {

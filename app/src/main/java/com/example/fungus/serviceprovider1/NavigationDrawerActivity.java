@@ -19,7 +19,7 @@ import android.view.View;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class NavigationDrawerActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,SPMenuActivity.OnFragmentInteractionListener,SPAddServiceActivity.OnFragmentInteractionListener,SPUpdateServiceActivity.OnFragmentInteractionListener {
+        implements NavigationView.OnNavigationItemSelectedListener,SPMenuActivity.OnFragmentInteractionListener {
 
     private FirebaseAuth mAuth;
     SharedPreferences sharedPreferences;
@@ -43,7 +43,7 @@ public class NavigationDrawerActivity extends AppCompatActivity
             public void onClick(View view) {
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
-                getSupportFragmentManager().beginTransaction().replace(R.id.screen_area,new SPAddServiceActivity()).commit();
+//                getSupportFragmentManager().beginTransaction().replace(R.id.screen_area,new SPAddServiceActivity()).commit();
             }
         });
 

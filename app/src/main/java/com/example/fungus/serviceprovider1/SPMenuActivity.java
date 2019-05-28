@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.fungus.serviceprovider1.model.Service;
 import com.google.firebase.auth.FirebaseAuth;
@@ -53,6 +54,8 @@ public class SPMenuActivity extends Fragment {
     private String TAG = "SPMenuActivity";
     private ArrayList<Service> services;
     private RecyclerView recyclerView;
+    private TextView resultText;
+
 
     public SPMenuActivity() {
         // Required empty public constructor
@@ -104,6 +107,7 @@ public class SPMenuActivity extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        resultText = view.findViewById(R.id.resultText);
         recyclerView = view.findViewById(R.id.listMenuView);
         db = FirebaseDatabase.getInstance().getReference();
         auth = FirebaseAuth.getInstance();
@@ -122,15 +126,21 @@ public class SPMenuActivity extends Fragment {
                     Service service = new Service(next.child("s_id").getValue().toString(), Double.valueOf(next.child("s_latitude").getValue().toString()),Double.valueOf(next.child("s_longitude").getValue().toString()),next.child("s_name").getValue().toString(),next.child("s_state").getValue().toString(),next.child("s_type").getValue().toString());
                     services.add(service);
                 }
+                if(services.size()!=0)
+                    resultText.setVisibility(View.INVISIBLE);
+
                 CustomAdapterMenuList customAdapterMenuList = new CustomAdapterMenuList(services, new CustomAdapterMenuList.OnItemClickListener() {
                     @Override
                     public void onItemClick(Service item) {
                         String i = item.getS_id();
-                        Bundle bundle = new Bundle();
-                        bundle.putString("s_id", i);
-                        SPUpdateServiceActivity spUpdateServiceActivity = new SPUpdateServiceActivity();
-                        spUpdateServiceActivity.setArguments(bundle);
-                        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.screen_area,spUpdateServiceActivity).commit();
+                        Intent intent = new Intent(getContext(),SPAddServiceActivity.class);
+                        intent.putExtra("s_id",i);
+                        startActivity(intent);
+//                        Bundle bundle = new Bundle();
+//                        bundle.putString("s_id", i);
+//                        SPUpdateServiceActivity spUpdateServiceActivity = new SPUpdateServiceActivity();
+//                        spUpdateServiceActivity.setArguments(bundle);
+//                        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.screen_area,spUpdateServiceActivity).commit();
                     }
                 });
                 recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));

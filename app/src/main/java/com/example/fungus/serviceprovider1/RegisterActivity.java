@@ -69,9 +69,11 @@ public class RegisterActivity extends AppCompatActivity {
         }else if(editContact.getText().toString().equals("")){
             Toast.makeText(RegisterActivity.this,"Phone number cannot blank",Toast.LENGTH_SHORT).show();
         }else {
+            SharedPreferences pref = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, 0);
+            String regId = pref.getString("regId", null);
             FirebaseUser fbUser = mAuth.getCurrentUser();
             String id = fbUser.getUid();
-            userType = 0;
+            userType = 2;
             Log.e("key", id);
             String email = editGmail.getText().toString();
             String name = editUserName.getText().toString();
@@ -80,16 +82,16 @@ public class RegisterActivity extends AppCompatActivity {
             if (switchUserType.isChecked()) {
                 userType = 1;
             } else {
-                userType = 0;
+                userType = 2;
             }
-            User user = new User(id, email, name, userType,contact);
+            User user = new User(id, email, name, userType,contact,regId);
             mDatabase.child("users").child(id).setValue(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
                     // Write was successful!
                     Toast.makeText(RegisterActivity.this, "Register Success", Toast.LENGTH_SHORT).show();
                     Log.e(TAG, "register success");
-                    if (userType == 0) {
+                    if (userType == 2) {
                         startActivity(new Intent(RegisterActivity.this, MapsMainActivity_T.class));
                         finish();
                     } else if (userType == 1) {

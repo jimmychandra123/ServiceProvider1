@@ -8,6 +8,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -39,6 +42,8 @@ public class UserMessageActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     TextView receiverName;
     TextView txtName, txtDate, txtTime, txtStatus;
+    WebView webView;
+    String token,title,message,serverURL,serverNO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +60,14 @@ public class UserMessageActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        //notification
+        webView = findViewById(R.id.vwWeb);
+        serverURL = "172.20.10.4";
+        serverNO = ":8888";
+//        token = "eqsjDyx-RS0:APA91bGq3ZqX6CgKmCNJ9Hec8RJ1EZ1wGCmFID8Go-uPydZJpJUgOLTiZnHlrkyWv1ZoFUd84VHzDtlXwYiJTlpaUXZ9Nsb5q5w5DxxZanvWe9cTOpvbt0Q2hAQZyy4vc4k_N47MB6Mz";
+//        String title = "title";
+//        String message = "message";
 
         receiverName = findViewById(R.id.receiverName);
         btnSendMessage = findViewById(R.id.btnSendMessage);
@@ -134,6 +147,7 @@ public class UserMessageActivity extends AppCompatActivity {
                 User user = dataSnapshot.getValue(User.class);
                 receive_name = user.getName();
                 receiverName.setText(receive_name);
+                token = user.getRegID();
 
                 readMessage(send_id,receive_id);
             }
@@ -143,6 +157,21 @@ public class UserMessageActivity extends AppCompatActivity {
 
             }
         });
+
+        databaseReference.child("users").child(send_id).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                String sender_name = user.getName();
+                title = sender_name;
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
 
         btnSendMessage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -164,6 +193,17 @@ public class UserMessageActivity extends AppCompatActivity {
         hashMap.put("message",message);
 
         databaseReference.child("Message").child(booking_id).push().setValue(hashMap);
+        String url = "http://"+serverURL+serverNO+"/webServiceJSON/?regId="+token+"&title="+title+"&message="+message+"&push_type=individual";
+        webView.loadUrl(url);
+
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                return false;
+            }
+        });
+        webView.setWebChromeClient(new WebChromeClient());
     }
 
     private void readMessage(final String myid, final String userid){

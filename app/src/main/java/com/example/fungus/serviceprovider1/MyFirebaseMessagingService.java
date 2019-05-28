@@ -91,7 +91,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 notificationUtils.playNotificationSound();
             } else {
                 // app is in background, show the notification in notification tray
-                Intent resultIntent = new Intent(getApplicationContext(), MainActivity.class);
+                Intent resultIntent = new Intent(getApplicationContext(), LoginActivity.class);
                 resultIntent.putExtra("message", message);
 
                 // check for image attachment

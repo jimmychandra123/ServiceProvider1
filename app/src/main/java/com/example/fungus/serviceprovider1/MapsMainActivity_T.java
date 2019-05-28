@@ -379,7 +379,7 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         if(id == R.id.nav_home){
-
+            startActivity(new Intent(this,MainActivity.class));
         }else if(id == R.id.nav_out){
             editor.remove("user_id");
             editor.remove("password");
