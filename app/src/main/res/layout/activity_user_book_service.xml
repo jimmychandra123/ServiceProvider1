@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".UserBookServiceActivity">
 
+    <include layout="@layout/toolbar"
+        android:id="@+id/layoutToolbar2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
     <TextView
+        android:layout_below="@+id/layoutToolbar2"
+        android:layout_margin="5dp"
+        android:layout_centerHorizontal="true"
         android:id="@+id/b_serviceName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -14,12 +23,12 @@
         android:text="Service Name"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.459"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+         />
 
     <TextView
+        android:layout_below="@+id/b_serviceName"
+        android:layout_margin="5dp"
+        android:layout_centerHorizontal="true"
         android:id="@+id/b_serviceDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -27,11 +36,12 @@
         android:text="dd/mm/yyyy"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/b_serviceName" />
+         />
 
     <TextView
+        android:layout_below="@+id/btnBDate"
+        android:layout_margin="5dp"
+        android:layout_centerHorizontal="true"
         android:id="@+id/b_serviceTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -39,39 +49,38 @@
         android:text="00:00"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnBDate" />
+         />
 
     <Button
+        android:layout_below="@+id/b_serviceDate"
+        android:layout_margin="5dp"
+        android:layout_centerHorizontal="true"
         android:id="@+id/btnBDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="Pick a date"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/b_serviceDate" />
+         />
 
     <Button
+        android:layout_below="@+id/b_serviceTime"
+        android:layout_margin="5dp"
+        android:layout_centerHorizontal="true"
         android:id="@+id/btnBTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="PICK A TIME"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.507"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/b_serviceTime" />
+        />
 
     <Button
+        android:layout_below="@+id/btnBTime"
+        android:layout_margin="5dp"
+        android:layout_centerHorizontal="true"
         android:id="@+id/btn_book"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="42dp"
         android:text="BOOK"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnBTime" />
-</android.support.constraint.ConstraintLayout>
+         />
+</RelativeLayout>

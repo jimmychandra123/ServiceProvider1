@@ -344,7 +344,7 @@ public class SPUpdateServiceActivity extends AppCompatActivity  {
 //        final String id = mDatabase.child("Service").push().getKey();
         String SP_name = name.getText().toString();
         Address address = new Address();
-        service = new Service(s_id,SP_name,stateSelection,typeSelection,SP_id);
+        service = new Service(s_id,SP_name,stateSelection,typeSelection);
 //        Search search = new Search(id,"barber",stateSelection,markerLat,markerLong);
         mDatabase.child("Service").child(SP_id).child(s_id).setValue(service).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override

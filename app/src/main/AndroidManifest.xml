@@ -26,7 +26,8 @@
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".MainActivity" />
-        <activity android:name=".LoginActivity">
+        <activity android:name=".LoginActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -72,15 +73,20 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".SPMenuActivity_T2" />
         <activity android:name=".TestActivity" />
-        <activity android:name=".UserBookServiceActivity" />
-        <activity android:name=".UserManageBookingActivity" />
+        <activity android:name=".UserBookServiceActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name=".UserManageBookingActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
         <activity
             android:name=".SPNavigationDrawerActivity"
             android:label="Service Provider"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".SPManageBookingActivity"
-            android:label="Manage Booking" />
+            android:label="Manage Booking"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".SPAddServiceActivity"
             android:label="Add Service"
@@ -109,7 +115,10 @@
         </service>
 
         <activity android:name=".LineChartActivity"></activity>
-        <activity android:name=".ReportGraph"></activity>
+        <activity android:name=".ReportGraph"
+            android:theme="@style/AppTheme.NoActionBar">
+
+        </activity>
 
     </application>
 

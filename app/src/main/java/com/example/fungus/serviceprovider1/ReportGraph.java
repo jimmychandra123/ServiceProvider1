@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,6 +42,17 @@ public class ReportGraph extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_report_graph);
 
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar2);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Report");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction().add(R.id.container, new PlaceholderFragment()).commit();
             getSupportFragmentManager().beginTransaction().add(R.id.container2, new PlaceholderFragment2()).commit();
@@ -72,8 +84,14 @@ public class ReportGraph extends AppCompatActivity {
         private boolean hasLabelForSelected = false;
         private boolean pointsHaveDifferentColor;
         private boolean hasGradientToTransparent = false;
+        private View mProgressView;
 
         public PlaceholderFragment() {
+        }
+
+        private void showProgress(final boolean show) {
+            chart.setVisibility(show? View.GONE:View.VISIBLE);
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
         }
 
         @Override
@@ -81,12 +99,12 @@ public class ReportGraph extends AppCompatActivity {
             setHasOptionsMenu(true);
             View rootView = inflater.inflate(R.layout.fragment_line_chart, container, false);
 
+            mProgressView = rootView.findViewById(R.id.login_progress);
             chart = (LineChartView) rootView.findViewById(R.id.chart);
             chart.setOnValueTouchListener(new ReportGraph.PlaceholderFragment.ValueTouchListener());
-
+            showProgress(true);
             // Generate some random values.
             generateValues();
-
             // Disable viewport recalculations, see toggleCubic() method for more info.
             chart.setViewportCalculationEnabled(false);
 
@@ -130,6 +148,7 @@ public class ReportGraph extends AppCompatActivity {
                             Log.e("e",String.valueOf(pointValues[0][4]));
                         }
                     }
+                    showProgress(false);
                     generateData();
                     resetViewport();
 //                    toggleCubic();
@@ -234,7 +253,48 @@ public class ReportGraph extends AppCompatActivity {
 
             @Override
             public void onValueSelected(int lineIndex, int pointIndex, PointValue value) {
-                Toast.makeText(getActivity(), "Selected: " + value, Toast.LENGTH_SHORT).show();
+                String month = "";
+                switch (pointIndex) {
+                    case 0:
+                        month = "January";
+                        break;
+                    case 1:
+                        month = "February";
+                        break;
+                    case 2:
+                        month = "March";
+                        break;
+                    case 3:
+                        month = "April";
+                        break;
+                    case 4:
+                        month = "May";
+                        break;
+                    case 5:
+                        month = "June";
+                        break;
+                    case 6:
+                        month = "July";
+                        break;
+                    case 7:
+                        month = "August";
+                        break;
+                    case 8:
+                        month = "September";
+                        break;
+                    case 9:
+                        month = "October";
+                        break;
+                    case 10:
+                        month = "November";
+                        break;
+                    case 11:
+                        month = "December";
+                        break;
+                }
+                String show = "Total Booking of "+month+" is "+String.valueOf(value.getY()+" Bookings");
+                Toast.makeText(getActivity(), show, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getActivity(), "Selected: " + value, Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -269,8 +329,14 @@ public class ReportGraph extends AppCompatActivity {
         private boolean hasLabelForSelected = false;
         private boolean pointsHaveDifferentColor;
         private boolean hasGradientToTransparent = false;
+        private View mProgressView;
 
         public PlaceholderFragment2() {
+        }
+
+        private void showProgress(final boolean show) {
+            chart.setVisibility(show? View.GONE:View.VISIBLE);
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
         }
 
         @Override
@@ -278,9 +344,11 @@ public class ReportGraph extends AppCompatActivity {
             setHasOptionsMenu(true);
             View rootView = inflater.inflate(R.layout.fragment_line_chart, container, false);
 
+            mProgressView = rootView.findViewById(R.id.login_progress);
             chart = (LineChartView) rootView.findViewById(R.id.chart);
             chart.setOnValueTouchListener(new ReportGraph.PlaceholderFragment2.ValueTouchListener());
 
+            showProgress(true);
             // Generate some random values.
             generateValues();
 
@@ -329,6 +397,7 @@ public class ReportGraph extends AppCompatActivity {
                             }
                         }
                     }
+                    showProgress(false);
                     generateData();
                     resetViewport();
 //                    toggleCubic();
@@ -433,8 +502,47 @@ public class ReportGraph extends AppCompatActivity {
 
             @Override
             public void onValueSelected(int lineIndex, int pointIndex, PointValue value) {
-                Toast.makeText(getActivity(), "Selected: " + value, Toast.LENGTH_SHORT).show();
-            }
+                String month = "";
+                switch (pointIndex) {
+                    case 0:
+                        month = "January";
+                        break;
+                    case 1:
+                        month = "February";
+                        break;
+                    case 2:
+                        month = "March";
+                        break;
+                    case 3:
+                        month = "April";
+                        break;
+                    case 4:
+                        month = "May";
+                        break;
+                    case 5:
+                        month = "June";
+                        break;
+                    case 6:
+                        month = "July";
+                        break;
+                    case 7:
+                        month = "August";
+                        break;
+                    case 8:
+                        month = "September";
+                        break;
+                    case 9:
+                        month = "October";
+                        break;
+                    case 10:
+                        month = "November";
+                        break;
+                    case 11:
+                        month = "December";
+                        break;
+                }
+                String show = "Total Canceled of "+month+" is "+String.valueOf(value.getY()+" Bookings");
+                Toast.makeText(getActivity(), show, Toast.LENGTH_SHORT).show();            }
 
             @Override
             public void onValueDeselected() {
@@ -468,8 +576,14 @@ public class ReportGraph extends AppCompatActivity {
         private boolean hasLabelForSelected = false;
         private boolean pointsHaveDifferentColor;
         private boolean hasGradientToTransparent = false;
+        private View mProgressView;
 
         public PlaceholderFragment3() {
+        }
+
+        private void showProgress(final boolean show) {
+            chart.setVisibility(show? View.GONE:View.VISIBLE);
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
         }
 
         @Override
@@ -477,9 +591,12 @@ public class ReportGraph extends AppCompatActivity {
             setHasOptionsMenu(true);
             View rootView = inflater.inflate(R.layout.fragment_line_chart, container, false);
 
+            mProgressView = rootView.findViewById(R.id.login_progress);
             chart = (LineChartView) rootView.findViewById(R.id.chart);
             chart.setOnValueTouchListener(new ReportGraph.PlaceholderFragment3.ValueTouchListener());
 
+
+            showProgress(true);
             // Generate some random values.
             generateValues();
 
@@ -528,6 +645,7 @@ public class ReportGraph extends AppCompatActivity {
                             }
                         }
                     }
+                    showProgress(false);
                     generateData();
                     resetViewport();
 //                    toggleCubic();
@@ -632,8 +750,47 @@ public class ReportGraph extends AppCompatActivity {
 
             @Override
             public void onValueSelected(int lineIndex, int pointIndex, PointValue value) {
-                Toast.makeText(getActivity(), "Selected: " + value, Toast.LENGTH_SHORT).show();
-            }
+                String month = "";
+                switch (pointIndex) {
+                    case 0:
+                        month = "January";
+                        break;
+                    case 1:
+                        month = "February";
+                        break;
+                    case 2:
+                        month = "March";
+                        break;
+                    case 3:
+                        month = "April";
+                        break;
+                    case 4:
+                        month = "May";
+                        break;
+                    case 5:
+                        month = "June";
+                        break;
+                    case 6:
+                        month = "July";
+                        break;
+                    case 7:
+                        month = "August";
+                        break;
+                    case 8:
+                        month = "September";
+                        break;
+                    case 9:
+                        month = "October";
+                        break;
+                    case 10:
+                        month = "November";
+                        break;
+                    case 11:
+                        month = "December";
+                        break;
+                }
+                String show = "Total Canceled of "+month+" is "+String.valueOf(value.getY()+" Bookings");
+                Toast.makeText(getActivity(), show, Toast.LENGTH_SHORT).show();            }
 
             @Override
             public void onValueDeselected() {

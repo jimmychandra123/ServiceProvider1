@@ -24,7 +24,6 @@ public class CustomAdapterBookingList extends RecyclerView.Adapter<CustomAdapter
     OnItemClickListener listener;
     int userType;
     DatabaseReference db;
-    User user;
 
     public CustomAdapterBookingList(List<Booking> listBooking, OnItemClickListener listener,int userType) {
         this.listBooking = listBooking;
@@ -46,16 +45,16 @@ public class CustomAdapterBookingList extends RecyclerView.Adapter<CustomAdapter
         holder.bind(listBooking.get(position),listener);
         db = FirebaseDatabase.getInstance().getReference();
         if(userType==0) {
-            db.child("users").child(listBooking.get(position).getSp_id()).addValueEventListener(new ValueEventListener() {
+            db.child("users").child(listBooking.get(position).getSp_id()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    user = dataSnapshot.getValue(User.class);
+                    final User user = dataSnapshot.getValue(User.class);
                     Booking booking = listBooking.get(position);
                     holder.txtName.setText(user.getName());
                     holder.txtDate.setText(String.valueOf(booking.getDate()));
                     holder.txtTime.setText(booking.getTime());
                     holder.txtStatus.setText(booking.getStatus());
-                    db.child("Service").child(listBooking.get(position).getSp_id()).child(listBooking.get(position).getS_id()).addValueEventListener(new ValueEventListener() {
+                    db.child("Service").child(listBooking.get(position).getSp_id()).child(listBooking.get(position).getS_id()).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             Service service = dataSnapshot.getValue(Service.class);
@@ -76,16 +75,16 @@ public class CustomAdapterBookingList extends RecyclerView.Adapter<CustomAdapter
                 }
             });
         }else{
-            db.child("users").child(listBooking.get(position).getU_id()).addValueEventListener(new ValueEventListener() {
+            db.child("users").child(listBooking.get(position).getU_id()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    user = dataSnapshot.getValue(User.class);
+                    final User user = dataSnapshot.getValue(User.class);
                     Booking booking = listBooking.get(position);
                     holder.txtName.setText(user.getName());
                     holder.txtDate.setText(String.valueOf(booking.getDate()));
                     holder.txtTime.setText(booking.getTime());
                     holder.txtStatus.setText(booking.getStatus());
-                    db.child("Service").child(listBooking.get(position).getSp_id()).child(listBooking.get(position).getS_id()).addValueEventListener(new ValueEventListener() {
+                    db.child("Service").child(listBooking.get(position).getSp_id()).child(listBooking.get(position).getS_id()).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             Service service = dataSnapshot.getValue(Service.class);

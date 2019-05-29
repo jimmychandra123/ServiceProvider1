@@ -7,7 +7,13 @@
     android:layout_height="match_parent"
     tools:context=".UserManageBookingActivity">
 
+    <include layout="@layout/toolbar"
+        android:id="@+id/layoutToolbar2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
     <android.support.v7.widget.RecyclerView
+        android:layout_below="@id/layoutToolbar2"
         android:id="@+id/listManageBookingView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -15,7 +21,18 @@
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
         />
+
+    <ProgressBar
+        android:layout_centerInParent="true"
+        android:id="@+id/login_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone" />
+
     <TextView
+        android:layout_below="@id/layoutToolbar2"
         android:id="@+id/resultText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

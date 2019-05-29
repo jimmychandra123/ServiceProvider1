@@ -152,7 +152,7 @@ public class SPMenuActivity extends Fragment {
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 // Getting Post failed, log a message
-                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+                Log.e(TAG, "loadPost:onCancelled", databaseError.toException());
                 // ...
             }
         };
@@ -190,5 +190,11 @@ public class SPMenuActivity extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        db.child("Service").child(sp_id).removeEventListener(postListener);
     }
 }

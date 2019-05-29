@@ -1,5 +1,6 @@
 package com.example.fungus.serviceprovider1;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
@@ -17,11 +18,14 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -38,7 +42,9 @@ import android.widget.Toast;
 import com.example.fungus.serviceprovider1.model.User;
 import com.example.fungus.serviceprovider1.sql.DatabaseTable;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
@@ -57,26 +63,10 @@ import java.util.List;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
-/**
- * A login screen that offers login via email/password.
- */
+
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
     private static final String TAG = "LoginActivity";
-    /**
-     * Id to identity READ_CONTACTS permission request.
-     */
     private static final int REQUEST_READ_CONTACTS = 0;
-
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
     private UserLoginTask mAuthTask = null;
     private BroadcastReceiver mRegistrationBroadcastReceiver;
 
@@ -93,14 +83,20 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private FirebaseAuth.AuthStateListener mAuthListener;
     private DatabaseReference mDatabase;
     ValueEventListener postListener;
+    private DatabaseReference ref;
     private String id;
-    private int userType = 3;
+    private int userType = 0;
+    private boolean checkLogin = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar2);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Service Provider");
+
         db =  new DatabaseTable((getApplicationContext()));
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
@@ -171,13 +167,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         if(!(sharedPreferences.getString("user_id",null)==null)){
             showProgress(true);
             String id = mAuth.getCurrentUser().getUid();
-
-
-            mDatabase.child("users").child(mAuth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            final ValueEventListener valueEventListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     User user = dataSnapshot.getValue(User.class);
                     if (user != null) {
+                        checkLogin = false;
                         Log.e(TAG + " userType", String.valueOf(user.getUserType()));
                         userType = user.getUserType();
                         SharedPreferences pref = getApplicationContext().getSharedPreferences(Config.SHARED_PREF, 0);
@@ -205,7 +200,24 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 public void onCancelled(DatabaseError databaseError) {
                     Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
                 }
-            });
+            };
+            ref = mDatabase.child("users").child(mAuth.getCurrentUser().getUid());
+            ref.addListenerForSingleValueEvent(valueEventListener);
+                (new Handler()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(checkLogin) {
+                            ref.removeEventListener(valueEventListener);
+                            showProgress(false);
+                            makeMessage("Login fail! Slow network connection!");
+                        }
+                    }
+                }, 5000);
+
+        }
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 500);
+            return;
         }
         editor = sharedPreferences.edit();
     }
@@ -320,14 +332,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
-    //Login when create app with previous account
-    private void attemptLoginOnCreate(){
-        showProgress(true);
-        String email = sharedPreferences.getString("user_id",null);
-        String password = sharedPreferences.getString("password",null);
-        mAuthTask = new UserLoginTask(email, password);
-        mAuthTask.execute((Void) null);
-    }
+//    //Login when create app with previous account
+//    private void attemptLoginOnCreate(){
+//        showProgress(true);
+//        String email = sharedPreferences.getString("user_id",null);
+//        String password = sharedPreferences.getString("password",null);
+//        mAuthTask = new UserLoginTask(email, password);
+//        mAuthTask.execute((Void) null);
+//    }
 
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
@@ -442,7 +454,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         private int userType = 3;
         private final String mEmail;
         private final String mPassword;
-        // 0=error; 1=loginSuccess; 2=passwordWrong; 3=emailRegister; 4=RegisterSuccess;
+        // 0=error; 1=loginSuccess; 2=passwordWrong; 3=emailRegister; 4=RegisterSuccess; 6=Network Error;
         private int condition = 0;
 
         UserLoginTask(String email, String password) {
@@ -492,6 +504,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
                             }
                         }
+                    }).addOnFailureListener(LoginActivity.this, new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.e("Sign In Fail","Slow");
+                            makeMessage("Slow Network Connection");
+                        }
                     });
 
             Task b = mAuth.createUserWithEmailAndPassword(mEmail, mPassword)
@@ -539,14 +557,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     mPasswordView.setError(getString(R.string.error_weak_password));
                     return false;
                 } catch (FirebaseAuthInvalidCredentialsException e) {
-                    condition = 3;
+                    condition = 2;
                     mEmailView.setError(getString(R.string.error_invalid_email));
                     return false;
                 } catch (FirebaseAuthUserCollisionException e) {
                     condition = 3;
                     mEmailView.setError(getString(R.string.error_user_exists));
                     return false;
-                } catch (Exception e) {
+                } catch (FirebaseNetworkException e){
+                    condition = 6;
+                    return false;
+                }
+                catch (Exception e) {
                     condition = 0;
                     Log.e(TAG, e.getMessage());
                     return false;
@@ -586,6 +608,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     break;
                 case 5:
                     mPasswordView.requestFocus();
+                    break;
+                case 6:
+                    makeMessage("Please check your network connectivity!");
                     break;
             }
 
@@ -642,7 +667,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         super.onPause();
     }
 
-
+    public void makeMessage(String message){
+        Toast.makeText(this,message,Toast.LENGTH_SHORT).show();;
+    }
 
 }
 

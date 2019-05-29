@@ -21,6 +21,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
@@ -49,14 +51,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import static android.support.design.widget.BottomSheetBehavior.STATE_COLLAPSED;
+import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
 
 public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener, GoogleMap.OnMarkerClickListener {
 
-    private RelativeLayout relativeLayout, relativeLayout2;
+    private RelativeLayout relativeLayout, relativeLayout2,bottomLayout,bottomLayout2;
     private BottomSheetBehavior bottomSheetBehavior, bottomSheetBehavior2;
     private FusedLocationProviderClient fusedLocationProviderClient;
     //    protected LocationManager locationManager;
@@ -67,7 +69,7 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
     private DatabaseReference db;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
-    private ValueEventListener postListener;
+    private ValueEventListener postListener,postListener2;
     private String TAG = "MapsMainActivity_T";
     private ArrayList<Service> services;
     private Location currentLocation;
@@ -76,13 +78,16 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
     private Marker marker;
 
     private Button btnBook;
-    private TextView p_serviceName, p_servicePName, p_serviceType;
+    private TextView p_serviceName, p_servicePName, p_serviceType, p_serviceAddress,searchText,userEmail,userName ,txtRating;
     private ConstraintLayout constraintLayout;
     private User user;
     String sp_id, s_id, s_name = null;
     RatingBar rb;
     float ratingValue;
     List<Rating> ratingList;
+    private ImageButton searchButton2,imageClose;
+    private EditText editQuery2;
+    private View mProgressView;
 
 
     @Override
@@ -90,6 +95,11 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps_main__t);
 
+        txtRating = findViewById(R.id.txtRating);
+        mProgressView = findViewById(R.id.login_progress);
+
+        bottomLayout2 = findViewById(R.id.bottomLayout2);
+        bottomLayout = findViewById(R.id.bottomLayout);
         relativeLayout2 = findViewById(R.id.bottom_sheet2);
         relativeLayout = findViewById(R.id.bottom_sheet);
         bottomSheetBehavior = BottomSheetBehavior.from(relativeLayout);
@@ -98,12 +108,77 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar2);
         setSupportActionBar(toolbar);
 
+        bottomLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(bottomSheetBehavior.getState()==STATE_COLLAPSED){
+                    bottomSheetBehavior.setState(STATE_EXPANDED);
+                }else{
+                    bottomSheetBehavior.setState(STATE_COLLAPSED);
+                }
+            }
+        });
+
+        bottomLayout2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(bottomSheetBehavior2.getState()==STATE_COLLAPSED){
+                    bottomSheetBehavior2.setState(STATE_EXPANDED);
+                }else{
+                    bottomSheetBehavior2.setState(STATE_COLLAPSED);
+                }
+            }
+        });
+
+        imageClose = findViewById(R.id.imageClose);
+        imageClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                relativeLayout.setVisibility(View.INVISIBLE);
+            }
+        });
+        searchText = findViewById(R.id.searchText);
+        searchText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(bottomSheetBehavior2.getState()==STATE_COLLAPSED){
+                    bottomSheetBehavior2.setState(STATE_EXPANDED);
+                }else{
+                    bottomSheetBehavior2.setState(STATE_COLLAPSED);
+                }
+            }
+        });
+
 //        constraintLayout = findViewById(R.id.selectedServiceView);
         btnBook = findViewById(R.id.p_ServiceBook);
+        p_serviceAddress = findViewById(R.id.p_serviceAddress);
         p_serviceName = findViewById(R.id.p_serviceName);
+        p_serviceName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(bottomSheetBehavior.getState()==STATE_COLLAPSED){
+                    bottomSheetBehavior.setState(STATE_EXPANDED);
+                }else{
+                    bottomSheetBehavior.setState(STATE_COLLAPSED);
+                }
+            }
+        });
         p_servicePName = findViewById(R.id.p_servicePName);
         p_serviceType = findViewById(R.id.p_serviceType);
         rb = (RatingBar) findViewById(R.id.ratingBarService);
+        editQuery2 = findViewById(R.id.editQuery2);
+        searchButton2 = findViewById(R.id.searchButton2);
+        searchButton2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String searchText = editQuery2.getText().toString();
+                if(!searchText.equals("")){
+                    fnSearch(searchText);
+                }else{
+                    Toast.makeText(getApplicationContext(),"Search Cannot Blank",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
         ratingList = new ArrayList<>();
 
         relativeLayout.setVisibility(View.INVISIBLE);
@@ -137,6 +212,28 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseDatabase.getInstance().getReference();
 
+        View headerLayout = navigationView.inflateHeaderView(R.layout.nav_header_navigation_drawer);
+        userName = headerLayout.findViewById(R.id.userName);
+        userEmail = headerLayout.findViewById(R.id.userEmail);
+        if(!mAuth.getCurrentUser().getUid().equals("")){
+            db.child("users").child(mAuth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    User user = dataSnapshot.getValue(User.class);
+                    if(user!=null){
+                        userName.setText(user.getName());
+                        userEmail.setText(user.getUser_email());
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+
+
         btnBook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -160,24 +257,27 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 search = searchArray[i];
                 mMap.clear();
-                db.child("Search").child("Malacca").child(search).addListenerForSingleValueEvent(postListener);
+                fetchLastLocation();
+                showProgress(true);
+                db.child("Search").child("Malacca").orderByChild("s_type").equalTo(search).addListenerForSingleValueEvent(postListener);
 
                 bottomSheetBehavior2.setState(STATE_COLLAPSED);
             }
         });
-        db.child("Search").child("Malacca").child("barber");
+//        db.child("Search").child("Malacca").order("barber");
         if (currentLocation != null) {
         }
         postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Iterable<DataSnapshot> snapshotIterator = dataSnapshot.getChildren();
-                Iterator<DataSnapshot> iterator = snapshotIterator.iterator();
+//                Iterable<DataSnapshot> snapshotIterator = dataSnapshot.getChildren();
+//                Iterator<DataSnapshot> iterator = snapshotIterator.iterator();
                 services = new ArrayList<>();
-                while (iterator.hasNext()) {
-                    DataSnapshot next = (DataSnapshot) iterator.next();
+                for (DataSnapshot next : dataSnapshot.getChildren()) {
+//                    DataSnapshot next = (DataSnapshot) iterator.next();
                     //getting value
-                    Service service = new Service(next.child("s_id").getValue().toString(), Double.valueOf(next.child("s_latitude").getValue().toString()), Double.valueOf(next.child("s_longitude").getValue().toString()), next.child("s_name").getValue().toString(), next.child("s_state").getValue().toString(), next.child("s_type").getValue().toString(), next.child("sp_id").getValue().toString());
+                    Service service = next.getValue(Service.class);
+//                    Service service = new Service(next.child("s_id").getValue().toString(), Double.valueOf(next.child("s_latitude").getValue().toString()), Double.valueOf(next.child("s_longitude").getValue().toString()), next.child("s_name").getValue().toString(), next.child("s_state").getValue().toString(), next.child("s_type").getValue().toString(), next.child("sp_id").getValue().toString());
 //                    services.add(next.getValue(Service.class));
                     Location serviceLocation = new Location(currentLocation);
                     serviceLocation.setLatitude(service.getS_latitude());
@@ -203,10 +303,10 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
 //                    }
 //                }
 
-                for (Service service : services) {
-                    Log.e(TAG, String.valueOf(service.getDistance()));
-                    Log.e(TAG, service.getS_name());
-                }
+//                for (Service service : services) {
+//                    Log.e(TAG, String.valueOf(service.getDistance()));
+//                    Log.e(TAG, service.getS_name());
+//                }
 
                 for (int i = 0; i < services.size(); i++) {
                     if (i > 10) {
@@ -216,6 +316,7 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
                         marker.setTag(services.get(i).getS_id());
                     }
                 }
+                showProgress(false);
 //                for(DataSnapshot data : dataSnapshot.getChildren()){
 //                    Search search = dataSnapshot.getValue(Search.class);
 //                    Log.e(TAG,String.valueOf(search.getS_long()));
@@ -249,6 +350,17 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
             }
         });
 
+    }
+
+    private void showProgress(final boolean show) {
+        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
+    public void fnSearch(String searchText){
+        mMap.clear();
+        showProgress(true);
+        fetchLastLocation();
+        db.child("Search").child("Malacca").orderByChild("s_name").startAt(searchText).endAt(searchText+"\uf8ff").addListenerForSingleValueEvent(postListener);
     }
 
     public void quickSort(ArrayList<Service> arr, int begin, int end) {
@@ -379,7 +491,7 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         if(id == R.id.nav_home){
-            startActivity(new Intent(this,MainActivity.class));
+//            startActivity(new Intent(this,MainActivity.class));
         }else if(id == R.id.nav_out){
             editor.remove("user_id");
             editor.remove("password");
@@ -411,6 +523,8 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
                             sp_id = service.getSp_id();
                             s_id =  service.getS_id();
                             s_name = service.getS_name();
+                            String address = service.getNumber()+", "+service.getStreetNumber()+", "+service.getStreetName()+", "+service.getPostCode();
+                            p_serviceAddress.setText(address);
                             calculateAvr();
                         }
 
@@ -438,7 +552,8 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
     }
 
     protected void calculateAvr(){
-        db.child("Rating").child(s_id).addValueEventListener(new ValueEventListener() {
+        db.child("Rating").child(s_id).addValueEventListener(postListener2);
+        postListener2 = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 float avr = 0.0f;
@@ -463,6 +578,7 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
 //                textView2.setText(test);
                 rb.setStepSize(0.01f);
                 rb.setRating(avr);
+                txtRating.setText(test);
 //                ratingValue = avr;
             }
 
@@ -470,6 +586,11 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+    }
+    @Override
+    public void onStop(){
+        super.onStop();
+        db.child("Rating").child(s_id).removeEventListener(postListener2);
     }
 }

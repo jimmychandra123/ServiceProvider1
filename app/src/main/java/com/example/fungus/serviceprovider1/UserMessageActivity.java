@@ -15,11 +15,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.fungus.serviceprovider1.model.Booking;
 import com.example.fungus.serviceprovider1.model.Message;
 import com.example.fungus.serviceprovider1.model.Service;
 import com.example.fungus.serviceprovider1.model.User;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -44,6 +46,7 @@ public class UserMessageActivity extends AppCompatActivity {
     TextView txtName, txtDate, txtTime, txtStatus;
     WebView webView;
     String token,title,message,serverURL,serverNO;
+    ValueEventListener postListener,postListener2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,18 +100,28 @@ public class UserMessageActivity extends AppCompatActivity {
         btnConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                databaseReference.child("Booking").child(booking_id).child("status").setValue("Confirmed");
+                databaseReference.child("Booking").child(booking_id).child("status").setValue("Confirmed").addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        makeMessage("Booking Confirmed");
+                    }
+                });
             }
         });
 
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                databaseReference.child("Booking").child(booking_id).child("status").setValue("Canceled");
+                databaseReference.child("Booking").child(booking_id).child("status").setValue("Canceled").addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        makeMessage("Booking Canceled");
+                    }
+                });
             }
         });
 
-        databaseReference.child("Booking").child(booking_id).addValueEventListener(new ValueEventListener() {
+        databaseReference.child("Booking").child(booking_id).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Booking booking = dataSnapshot.getValue(Booking.class);
@@ -120,7 +133,7 @@ public class UserMessageActivity extends AppCompatActivity {
                     btnCancel.setVisibility(View.VISIBLE);
                     btnConfirm.setVisibility(View.VISIBLE);
                 }
-                databaseReference.child("Service").child(booking.getSp_id()).child(booking.getS_id()).addValueEventListener(new ValueEventListener() {
+                databaseReference.child("Service").child(booking.getSp_id()).child(booking.getS_id()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         Service service = dataSnapshot.getValue(Service.class);
@@ -141,24 +154,23 @@ public class UserMessageActivity extends AppCompatActivity {
             }
         });
 
-        databaseReference.child("users").child(receive_id).addValueEventListener(new ValueEventListener() {
+        databaseReference.child("users").child(receive_id).addListenerForSingleValueEvent(postListener);
+        postListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
                 receive_name = user.getName();
                 receiverName.setText(receive_name);
                 token = user.getRegID();
-
-                readMessage(send_id,receive_id);
-            }
+                }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
 
-        databaseReference.child("users").child(send_id).addValueEventListener(new ValueEventListener() {
+        databaseReference.child("users").child(send_id).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
@@ -183,6 +195,7 @@ public class UserMessageActivity extends AppCompatActivity {
                 editSendMessage.setText("");
             }
         });
+        readMessage(send_id,receive_id);
     }
 
     private void sendMessage(String sender,String receiver,String message){
@@ -208,7 +221,8 @@ public class UserMessageActivity extends AppCompatActivity {
 
     private void readMessage(final String myid, final String userid){
         messages = new ArrayList<>();
-        databaseReference.child("Message").child(booking_id).addValueEventListener(new ValueEventListener() {
+        databaseReference.child("Message").child(booking_id).addValueEventListener(postListener2);
+        postListener2= new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 messages.clear();
@@ -231,7 +245,17 @@ public class UserMessageActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
 
+    }
+
+    public void makeMessage(String message){
+        Toast.makeText(getApplicationContext(),message,Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        databaseReference.child("Message").child(booking_id).removeEventListener(postListener2);
     }
 }

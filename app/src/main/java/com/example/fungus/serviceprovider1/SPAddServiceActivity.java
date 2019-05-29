@@ -47,6 +47,7 @@ public class SPAddServiceActivity extends AppCompatActivity {
 //    private GoogleMap mMap;
 //    private static final int LOCATION_REQUEST = 500;
 
+    private double markerLat,markerLong = 0;
     private String TAG = "SPAddServiceActivity";
     private String id = null;
     private Context context;
@@ -160,6 +161,7 @@ public class SPAddServiceActivity extends AppCompatActivity {
         });
 
         if(getIntent().getStringExtra("s_id")!=null){
+            getSupportActionBar().setTitle("Update Service");
             id = getIntent().getStringExtra("s_id");
             fnReadDatabase();
         }
@@ -321,6 +323,8 @@ public class SPAddServiceActivity extends AppCompatActivity {
                     streetName.setText(service.getStreetName());
                     streetNumber.setText(service.getStreetNumber());
                     postCode.setText(service.getPostCode());
+                    markerLat = service.getS_latitude();
+                    markerLong = service.getS_longitude();
                 }
             }
 
@@ -342,12 +346,12 @@ public class SPAddServiceActivity extends AppCompatActivity {
         }
         String S_name = name.getText().toString();
 //        Address address = new Address(number.getText().toString(),streetNumber.getText().toString(),streetName.getText().toString(),postCode.getText().toString());
-        service = new Service(id,S_name,stateSelection,typeSelection,SP_id,number.getText().toString(),streetNumber.getText().toString(),streetName.getText().toString(),postCode.getText().toString());
+        service = new Service(id,markerLat,markerLong,S_name,stateSelection,typeSelection,SP_id,number.getText().toString(),streetNumber.getText().toString(),streetName.getText().toString(),postCode.getText().toString());
 //        Search search = new Search(id,"barber",stateSelection,markerLat,markerLong);
         mDatabase.child("Service").child(SP_id).child(id).setValue(service).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                mDatabase.child("Search").child(stateSelection).child(typeSelection).child(id).setValue(service).addOnSuccessListener(new OnSuccessListener<Void>() {
+                mDatabase.child("Search").child(stateSelection).child(id).setValue(service).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         makeMessage("Insert Location");

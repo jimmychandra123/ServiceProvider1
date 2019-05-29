@@ -8,7 +8,7 @@ public class Service {
     double s_longitude;
     String s_name;
     String s_state;
-    String address;
+//    String address;
     String s_type;
     double distance;
     String sp_id;
@@ -41,7 +41,22 @@ public class Service {
     }
 
     //for ServiceAdd
-    public Service(String s_id, String s_name, String s_state, String s_type,String sp_id,String number,String streetNumber,String streetName,String postCode) {
+
+    public Service(String s_id, double s_latitude, double s_longitude, String s_name, String s_state, String s_type, String sp_id, String number, String streetNumber, String streetName, String postCode) {
+        this.s_id = s_id;
+        this.s_latitude = s_latitude;
+        this.s_longitude = s_longitude;
+        this.s_name = s_name;
+        this.s_state = s_state;
+        this.s_type = s_type;
+        this.sp_id = sp_id;
+        this.number = number;
+        this.streetNumber = streetNumber;
+        this.streetName = streetName;
+        this.postCode = postCode;
+    }
+
+    public Service(String s_id, String s_name, String s_state, String s_type, String sp_id, String number, String streetNumber, String streetName, String postCode) {
         this.s_id = s_id;
         this.s_name = s_name;
         this.s_state = s_state;
@@ -53,11 +68,10 @@ public class Service {
         this.postCode = postCode;
     }
 
-    public Service(String s_id, String s_name, String s_state, String address, String s_type) {
+    public Service(String s_id, String s_name, String s_state, String s_type) {
         this.s_id = s_id;
         this.s_name = s_name;
         this.s_state = s_state;
-        this.address = address;
         this.s_type = s_type;
     }
 
@@ -123,14 +137,6 @@ public class Service {
 
     public void setS_state(String s_state) {
         this.s_state = s_state;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
     }
 
     public String getS_id() {
