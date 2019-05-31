@@ -81,7 +81,7 @@ public class UserManageBookingActivity extends AppCompatActivity {
                             Intent intent = new Intent(getApplicationContext(), UserMessageActivity.class);
                             intent.putExtra("id", sp_id);
                             intent.putExtra("b_id", b_id);
-                            intent.putExtra("user_type", "0");
+                            intent.putExtra("user_type", "2");
                             startActivity(intent);
 //                        Bundle bundle = new Bundle();
 //                        bundle.putString("s_id", i);

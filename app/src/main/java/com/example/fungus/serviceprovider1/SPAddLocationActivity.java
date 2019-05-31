@@ -151,11 +151,11 @@ public class SPAddLocationActivity extends AppCompatActivity implements OnMapRea
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Service service = dataSnapshot.getValue(Service.class);
                 if(service!=null){
+                    if(service.getS_latitude()==0&&service.getS_longitude()==0)
+                        fetchLastLocation();
                     if(service.getS_latitude() != 0 || service.getS_longitude() != 0) {
                         markerLat = service.getS_latitude();
                         markerLong = service.getS_longitude();
-                        if(markerLat==0&&markerLong==0)
-                            fetchLastLocation();
                         LatLng marker = new LatLng(service.getS_latitude(),service.getS_longitude());
                         if(mMap!=null){
                             mMap.addMarker(new MarkerOptions().position(marker));

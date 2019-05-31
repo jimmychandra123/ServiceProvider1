@@ -44,7 +44,7 @@ public class CustomAdapterBookingList extends RecyclerView.Adapter<CustomAdapter
     public void onBindViewHolder(@NonNull final CustomAdapterBookingList.ViewHolder holder, final int position) {
         holder.bind(listBooking.get(position),listener);
         db = FirebaseDatabase.getInstance().getReference();
-        if(userType==0) {
+        if(userType==2) {
             db.child("users").child(listBooking.get(position).getSp_id()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

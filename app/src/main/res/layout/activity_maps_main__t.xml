@@ -21,12 +21,41 @@
             android:layout_height="wrap_content"
             android:theme="@style/AppTheme.AppBarOverlay">
 
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar2"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="?attr/colorPrimary"
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+            <EditText
+                android:textColor="@android:color/black"
+                android:layout_marginLeft="80dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp"
+                android:id="@+id/editQuery2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:drawable/editbox_background"
+                android:ems="10"
+                android:hint="Search"
+                android:inputType="textPersonName"
+                />
+
+            <ImageButton
+                android:backgroundTint="@color/white"
+                android:id="@+id/searchButton2"
+                android:layout_width="46dp"
+                android:layout_height="49dp"
+                android:layout_marginTop="8dp"
+                app:srcCompat="@drawable/ic_search"
+                android:layout_toRightOf="@+id/editQuery2"
+                android:layout_toEndOf="@+id/editQuery2" />
+            </RelativeLayout>
 
         </android.support.design.widget.AppBarLayout>
 
@@ -61,27 +90,6 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:visibility="gone" />
-
-        <EditText
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"
-            android:id="@+id/editQuery2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@android:drawable/editbox_background"
-            android:ems="10"
-            android:hint="Search"
-            android:inputType="textPersonName"
-             />
-
-        <ImageButton
-            android:id="@+id/searchButton2"
-            android:layout_width="46dp"
-            android:layout_height="49dp"
-            android:layout_marginTop="8dp"
-            app:srcCompat="@drawable/ic_search"
-            android:layout_toRightOf="@+id/editQuery2"
-            android:layout_toEndOf="@+id/editQuery2" />
 
         <!--<include-->
             <!--layout="@layout/service_profile"-->

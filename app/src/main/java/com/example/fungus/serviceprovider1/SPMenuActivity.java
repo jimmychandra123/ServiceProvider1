@@ -195,6 +195,6 @@ public class SPMenuActivity extends Fragment {
     @Override
     public void onStop(){
         super.onStop();
-        db.child("Service").child(sp_id).removeEventListener(postListener);
+//        db.child("Service").child(sp_id).removeEventListener(postListener);
     }
 }

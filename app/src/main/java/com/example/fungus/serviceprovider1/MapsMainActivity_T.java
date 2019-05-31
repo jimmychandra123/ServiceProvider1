@@ -81,7 +81,7 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
     private TextView p_serviceName, p_servicePName, p_serviceType, p_serviceAddress,searchText,userEmail,userName ,txtRating;
     private ConstraintLayout constraintLayout;
     private User user;
-    String sp_id, s_id, s_name = null;
+    String sp_id, s_id, s_name = "";
     RatingBar rb;
     float ratingValue;
     List<Rating> ratingList;
@@ -107,6 +107,7 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar2);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("");
 
         bottomLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -316,6 +317,11 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
                         marker.setTag(services.get(i).getS_id());
                     }
                 }
+                if(mMap!=null){
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                            new LatLng(currentLocation.getLatitude(),
+                                    currentLocation.getLongitude()), 12));
+                }
                 showProgress(false);
 //                for(DataSnapshot data : dataSnapshot.getChildren()){
 //                    Search search = dataSnapshot.getValue(Search.class);
@@ -349,7 +355,40 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
                 }
             }
         });
+        postListener2 = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                float avr = 0.0f;
+                float sum = 0.0f;
+                int count=0;
+                ratingList.clear();
+                for(DataSnapshot ratingSnapShot : dataSnapshot.getChildren()){
+                    Rating rating = ratingSnapShot.getValue(Rating.class);
+                    ratingList.add(rating);
+                }
+                for(int i=0;i<ratingList.size();i++){
+                    if(ratingList.get(i).getService_id().equals(s_id)){
+                        sum += ratingList.get(i).getRatingValue();
+                        count++;
+                    }
+                }
+                avr = sum/count;
+                String test = String.format("%.02f", avr);
+//                RatingList adapter = new RatingList(Main2Activity.this,ratingList);
+//                listView.setAdapter(adapter);
+//                amtReview.setText(Integer.toString(count)+" reviewed");
+//                textView2.setText(test);
+                rb.setStepSize(0.01f);
+                rb.setRating(avr);
+                txtRating.setText(test);
+//                ratingValue = avr;
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
     }
 
     private void showProgress(final boolean show) {
@@ -552,45 +591,10 @@ public class MapsMainActivity_T extends AppCompatActivity implements OnMapReadyC
     }
 
     protected void calculateAvr(){
-        db.child("Rating").child(s_id).addValueEventListener(postListener2);
-        postListener2 = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                float avr = 0.0f;
-                float sum = 0.0f;
-                int count=0;
-                ratingList.clear();
-                for(DataSnapshot ratingSnapShot : dataSnapshot.getChildren()){
-                    Rating rating = ratingSnapShot.getValue(Rating.class);
-                    ratingList.add(rating);
-                }
-                for(int i=0;i<ratingList.size();i++){
-                    if(ratingList.get(i).getService_id().equals(s_id)){
-                        sum += ratingList.get(i).getRatingValue();
-                        count++;
-                    }
-                }
-                avr = sum/count;
-                String test = String.format("%.02f", avr);
-//                RatingList adapter = new RatingList(Main2Activity.this,ratingList);
-//                listView.setAdapter(adapter);
-//                amtReview.setText(Integer.toString(count)+" reviewed");
-//                textView2.setText(test);
-                rb.setStepSize(0.01f);
-                rb.setRating(avr);
-                txtRating.setText(test);
-//                ratingValue = avr;
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        };
+        db.child("Rating").child(s_id).addListenerForSingleValueEvent(postListener2);
     }
     @Override
     public void onStop(){
         super.onStop();
-        db.child("Rating").child(s_id).removeEventListener(postListener2);
     }
 }

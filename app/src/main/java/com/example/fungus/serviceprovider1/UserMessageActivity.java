@@ -154,8 +154,7 @@ public class UserMessageActivity extends AppCompatActivity {
             }
         });
 
-        databaseReference.child("users").child(receive_id).addListenerForSingleValueEvent(postListener);
-        postListener = new ValueEventListener() {
+        databaseReference.child("users").child(receive_id).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
@@ -168,7 +167,7 @@ public class UserMessageActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        };
+        });
 
         databaseReference.child("users").child(send_id).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -176,6 +175,7 @@ public class UserMessageActivity extends AppCompatActivity {
                 User user = dataSnapshot.getValue(User.class);
                 String sender_name = user.getName();
                 title = sender_name;
+                readMessage(send_id,receive_id);
             }
 
             @Override
@@ -195,7 +195,6 @@ public class UserMessageActivity extends AppCompatActivity {
                 editSendMessage.setText("");
             }
         });
-        readMessage(send_id,receive_id);
     }
 
     private void sendMessage(String sender,String receiver,String message){
@@ -221,7 +220,6 @@ public class UserMessageActivity extends AppCompatActivity {
 
     private void readMessage(final String myid, final String userid){
         messages = new ArrayList<>();
-        databaseReference.child("Message").child(booking_id).addValueEventListener(postListener2);
         postListener2= new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -246,6 +244,8 @@ public class UserMessageActivity extends AppCompatActivity {
 
             }
         };
+        databaseReference.child("Message").child(booking_id).addValueEventListener(postListener2);
+
 
     }
 
