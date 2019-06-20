@@ -4,7 +4,7 @@ Final project for MAD subject. This project develop a mobile application for Com
 # Introduction
 This mobile application act as a platform for community user to search for the service nearby. This mobile application also is a platform of directory for service which store the information of services provided by Service Provider.
 
-This project is developed using Android Studio which using JAVA programming language. This project integrate with the Google Maps Api as mapping and Google Firebase as storage.
+This project is developed using Android Studio which using JAVA programming language. This project integrate with the Google Maps API as mapping and Google Firebase API as storage.
 
 # Module / Functionalities of the mobile apps.
 Community User
