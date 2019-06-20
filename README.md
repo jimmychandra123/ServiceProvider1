@@ -1,4 +1,4 @@
-# ServiceProvider1
+# ServiceProvider
 Final project for MAD subject. This project develop a mobile application for Community User and Service Provider.
 
 # Introduction
