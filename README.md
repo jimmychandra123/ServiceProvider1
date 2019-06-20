@@ -26,14 +26,15 @@ Service Provider
 
 
 # Library/external API used
-Google Maps API.
-Google Firebase API.
-Google Cloud Messaging.
-HelloCharts Library
-SlidingUp Panel Library
+- Google Maps API.
+- Google Firebase API.
+- Google Cloud Messaging.
+- HelloCharts Library
+- SlidingUp Panel Library
 
 # Setup the development enviroment
 the following is the library required to implement into the mobile applicaiton. 
+```
   implementation 'com.google.android.gms:play-services-maps:16.1.0'
   implementation 'com.google.android.gms:play-services-location:16.0.0'
   implementation 'com.google.firebase:firebase-core:16.0.8'
@@ -44,3 +45,4 @@ the following is the library required to implement into the mobile applicaiton.
   implementation 'com.sothree.slidinguppanel:library:3.4.0'
   implementation 'com.firebaseui:firebase-ui-database:3.1.3'
   implementation 'com.github.lecho:hellocharts-library:1.5.8@aar'
+```
