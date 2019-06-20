@@ -7,7 +7,9 @@ This project is developed using Android Studio which using JAVA programming lang
 
 # Module / Functionalities of the mobile apps.
 Community User
+!
 •	Login account as community user.
+!
 •	Search service by type-in and category option.
 •	View service provided by service provider.
 •	View information of service.
