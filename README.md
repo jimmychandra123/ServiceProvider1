@@ -33,7 +33,20 @@ Service Provider
 - SlidingUp Panel Library
 
 # Setup the development enviroment
-the following is the library required to implement into the mobile applicaiton. 
+First install the JAVA SDK and JRE enviroment.
+
+#### Java JRE
+https://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html
+
+#### Java SDK
+https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+
+#### Install Android Studio
+https://developer.android.com/studio/
+
+#### Create a new project, add the coding and the library.
+Add the following the library into the app gradle build file
+All of this library required to implement into the mobile applicaiton. 
 ```
   implementation 'com.google.android.gms:play-services-maps:16.1.0'
   implementation 'com.google.android.gms:play-services-location:16.0.0'
