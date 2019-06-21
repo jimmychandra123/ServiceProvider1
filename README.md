@@ -26,11 +26,11 @@ Service Provider
 
 
 # Library/external API used
-- Google Maps API.
-- Google Firebase API.
-- Google Cloud Messaging.
-- HelloCharts Library
-- SlidingUp Panel Library
+- Google Maps API. (provide Geolocation for service)
+- Google Firebase API. (as data storage)
+- Google Cloud Messaging. (send message)
+- HelloCharts Library. (reporting graphs and charts)
+- SlidingUp Panel Library (interface)
 
 # Setup the development enviroment
 First install the JAVA SDK and JRE enviroment.
